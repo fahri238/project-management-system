@@ -1,0 +1,35 @@
+/* src/styles/global.css */
+@import "./variables.css";
+
+/* RESET & BASE SETUP */
+html {
+  font-size: 62.5%; /* KUNCI: Membuat 1rem = 10px */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif; /* Pakai Poppins */
+  font-weight: var(--fw-light);
+  color: var(--color-text-muted);
+  background-color: #fff;
+  font-size: var(--fs-md);
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}

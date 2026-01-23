@@ -1,0 +1,145 @@
+/* src/components/Header.module.css */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem 2rem;
+  /* Agar header nempel di atas saat scroll (Sticky) opsional */
+  position: sticky; 
+  top: 0;
+  z-index: 10;
+  background-color: var(--neutral); /* Match background body agar seamless */
+  border-radius: 1.8rem;
+  /* Atau gunakan backdrop-filter blur jika ingin efek kaca */
+}
+
+/* SEARCH */
+.searchContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 350px;
+  background-color: var(--neutral);
+}
+
+.searchInput {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  padding-right: 4rem; /* Ruang untuk icon search */
+  outline: none;
+  font-family: inherit;
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-sm);
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  transition: all 0.3s ease;
+}
+
+.searchInput:focus {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.searchBtn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+}
+
+/* ACTIONS */
+.actionGroup {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.actionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fff;
+  padding: 1rem 1.5rem;
+  min-width: 160px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-main);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  transition: all 0.2s ease;
+}
+
+.actionItem:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+/* USER PROFILE */
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.notification {
+  position: relative;
+  cursor: pointer;
+  color: var(--color-secondary);
+  display: flex;
+  align-items: center;
+}
+
+.notifDot {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background-color: #ef4444; /* Merah */
+  border-radius: 50%;
+  border: 1px solid #fff;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #e0f2fe; /* Biru muda sekali */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.userDetails {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-main);
+  line-height: 1.2;
+  margin: 0 0 0.4rem 0;
+}
+
+.userEmail {
+  font-size: 1rem; /* Kecil */
+  color: var(--color-text-faded);
+}

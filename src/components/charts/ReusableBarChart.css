@@ -1,0 +1,23 @@
+/* src/components/charts/ReusableBarChart.css */
+
+.bar-cell {
+  /* 1. Transisi Halus (0.3 detik) */
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* 2. KUNCI AGAR TIDAK MELAYANG: 
+     Memberitahu browser bahwa titik tumpu (origin) dihitung 
+     berdasarkan kotak batang itu sendiri, bukan canvas grafik. */
+  transform-box: fill-box;
+
+  cursor: pointer;
+  outline: none;
+}
+
+/* Efek saat Hover */
+.bar-cell:hover {
+  /* Lebih Tajam/Gelap */
+  filter: brightness(0.75);
+
+  /* Membesar Sedikit (5%) */
+  transform: scale(1.07);
+}

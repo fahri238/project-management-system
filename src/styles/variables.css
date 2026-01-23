@@ -1,0 +1,31 @@
+/* src/styles/variables.css */
+:root {
+  /* --- PALET WARNA SAGARA AI --- */
+  --color-primary: #1c4d8d; /* Biru Gelap Utama */
+  --color-secondary: #4988c4; /* Biru Sedang */
+  --color-tertiary: #bde8f5; /* Biru Muda */
+  --accent-dark: #0f2854; /* Navy Gelap */
+  --neutral: #f3f3f3; /* Abu-abu background */
+
+  /* Text Colors */
+  --color-text-main: #1a1a1a;
+  --color-text-muted: #595959;
+  --color-text-faded: #767676;
+
+  /* Ukuran Font (Sesuai desain Anda) */
+  --fs-xs: 1.1rem;
+  --fs-sm: 1.3rem;
+  --fs-md: 1.6rem;
+  --fs-lg: 2rem;
+  --fs-xl: 3rem;
+
+  /* Font Weights */
+  --fw-light: 300;
+  --fw-regular: 400;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* Layout */
+  --sidebar-width: 32rem; /* 320px karena 1rem=10px */
+  --header-height: 7rem;
+}
