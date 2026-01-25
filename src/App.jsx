@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "./layouts/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
+import UserManagement from "./pages/admin/UserManagement";
 
 function App() {
   return (
@@ -12,14 +13,7 @@ function App() {
 
         <Route path="dashboard" element={<Dashboard />} />
 
-        <Route
-          path="projects"
-          element={
-            <div>
-              <h1>Halaman Project</h1>
-            </div>
-          }
-        />
+        <Route path="users" element={<UserManagement />} />
         <Route
           path="users"
           element={
