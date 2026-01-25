@@ -23,6 +23,14 @@ function App() {
           }
         />
         <Route
+          path="projects"
+          element={
+            <div>
+              <h1>Halaman Manajemen proyek</h1>
+            </div>
+          }
+        />
+        <Route
           path="monitoring"
           element={
             <div>
