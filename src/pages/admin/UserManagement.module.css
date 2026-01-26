@@ -84,7 +84,7 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
   overflow: auto;
-  min-height: 0
+  min-height: 0;
 }
 
 .table {
@@ -145,6 +145,29 @@
   transition: background 0.2s;
 }
 
+.detailBtn {
+  color: #3b82f6; /* Biru cerah (Primary) */
+}
+
+.detailBtn:hover {
+  background: #dbeafe; /* Biru sangat muda saat di-hover */
+  color: #1d4ed8; /* Biru lebih tua */
+}
+
+.editBtn {
+  color: #f59e0b;
+}
+.editBtn:hover {
+  background: #fef3c7;
+}
+
+.deleteBtn {
+  color: #ef4444;
+}
+.deleteBtn:hover {
+  background: #fee2e2;
+}
+
 /* --- CUSTOM SCROLLBAR --- */
 
 .tableContainer::-webkit-scrollbar-button {
@@ -160,7 +183,7 @@
 
 .tableContainer::-webkit-scrollbar-thumb {
   background-color: #cbd5e1; /* Warna abu-abu soft */
-  border-radius: 10px;       /* Membuat ujungnya bulat */
+  border-radius: 10px; /* Membuat ujungnya bulat */
   border: 2px solid transparent; /* Padding imajiner agar terlihat rapi */
   background-clip: content-box;
 }
@@ -173,20 +196,4 @@
 /* 4. Track (Jalur di belakang scrollbar) - Dibuat transparan/bersih */
 .tableContainer::-webkit-scrollbar-track {
   background: transparent;
-}
-
-
-
-.editBtn {
-  color: #f59e0b;
-}
-.editBtn:hover {
-  background: #fef3c7;
-}
-
-.deleteBtn {
-  color: #ef4444;
-}
-.deleteBtn:hover {
-  background: #fee2e2;
 }
