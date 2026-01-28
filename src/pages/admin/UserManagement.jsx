@@ -143,27 +143,31 @@ const UserManagement = () => {
                     </span>
                   </td>
                   <td style={{ textAlign: "center" }}>
-                    <button
-                      className={`${styles.actionBtn} ${styles.detailBtn}`}
-                      title="Lihat Detail"
-                      onClick={() =>
-                        console.log("Lihat detail user:", user.name)
-                      }
-                    >
-                      👁
-                    </button>
-                    <button
-                      className={`${styles.actionBtn} ${styles.editBtn}`}
-                      title="Edit"
-                    >
-                      ✎
-                    </button>
-                    <button
-                      className={`${styles.actionBtn} ${styles.deleteBtn}`}
-                      title="Hapus"
-                    >
-                      🗑
-                    </button>
+                    <div className={styles.actionCell}>
+                      {/* 1. Detail (TEXT ONLY) */}
+                      <button
+                        className={styles.detailBtn}
+                        onClick={() => console.log("Detail user:", user.name)}
+                      >
+                        Detail
+                      </button>
+
+                      {/* 2. Edit (ICON ONLY) */}
+                      <button
+                        className={`${styles.iconBtn} ${styles.editBtn}`}
+                        title="Edit"
+                      >
+                        ✎
+                      </button>
+
+                      {/* 3. Delete (ICON ONLY) */}
+                      <button
+                        className={`${styles.iconBtn} ${styles.deleteBtn}`}
+                        title="Hapus"
+                      >
+                        🗑
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))

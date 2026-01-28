@@ -135,37 +135,61 @@
 }
 
 /* Action Buttons */
-.actionBtn {
-  border: none;
-  background: none;
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 4px;
-  margin-right: 4px;
-  transition: background 0.2s;
+/* Container agar tombol sejajar rapi */
+.actionCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px; /* Jarak antar elemen */
 }
 
+/* 1. Tombol DETAIL (Bentuk Text Badge/Button) */
 .detailBtn {
-  color: #3b82f6; /* Biru cerah (Primary) */
+  background-color: #eff6ff; /* Background Biru Sangat Muda */
+  color: #2563eb; /* Teks Biru */
+  border: 1px solid #dbeafe;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .detailBtn:hover {
-  background: #dbeafe; /* Biru sangat muda saat di-hover */
-  color: #1d4ed8; /* Biru lebih tua */
+  background-color: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* 2. Tombol EDIT & DELETE (Bentuk Icon Saja) */
+.iconBtn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 1.1rem; /* Ukuran icon sedikit diperbesar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    transform 0.1s,
+    background 0.2s;
 }
 
 .editBtn {
-  color: #f59e0b;
+  color: #f59e0b; /* Kuning/Oranye */
 }
 .editBtn:hover {
-  background: #fef3c7;
+  background-color: #fef3c7;
 }
 
 .deleteBtn {
-  color: #ef4444;
+  color: #ef4444; /* Merah */
 }
 .deleteBtn:hover {
-  background: #fee2e2;
+  background-color: #fee2e2;
 }
 
 /* --- CUSTOM SCROLLBAR --- */
