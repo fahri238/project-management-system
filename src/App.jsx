@@ -3,6 +3,7 @@ import AdminLayout from "./layouts/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import UserManagement from "./pages/admin/UserManagement";
 import ProjectList from "./pages/admin/ProjectList";
+import DetailMonitoring from "./pages/admin/DetailMonitoring";
 
 function App() {
   return (
@@ -18,22 +19,8 @@ function App() {
 
         <Route path="projects" element={<ProjectList />} />
 
-        <Route
-          path="projects"
-          element={
-            <div>
-              <h1>Halaman Manajemen proyek</h1>
-            </div>
-          }
-        />
-        <Route
-          path="monitoring"
-          element={
-            <div>
-              <h1>Halaman Detail dan Monitoring</h1>
-            </div>
-          }
-        />
+        <Route path="monitoring" element={<DetailMonitoring />} />
+        
         <Route
           path="reports"
           element={

@@ -1,0 +1,296 @@
+/* Container Utama */
+.container {
+  background-color: var(--neutral);
+  padding: 2rem;
+  border-radius: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  height: calc(89vh - 4rem);
+}
+
+/* Header Section */
+.header {
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Controls (Search & Filter) */
+.controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  padding: 10px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  width: 300px;
+  outline: none;
+  transition: all 0.2s;
+}
+.searchInput:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.filterSelect {
+  /* 1. Atur Padding */
+  /* Atas-Bawah 10px, Kiri 16px. */
+  /* Kanan kita beri 40px agar teks tidak menabrak panah */
+  padding: 10px 40px 10px 16px;
+  
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  outline: none;
+  color: #475569;
+  cursor: pointer;
+  background-color: white;
+  font-size: 0.9rem; /* Opsional: Agar teks pas */
+
+  /* 2. SEMBUNYIKAN PANAH BAWAAN BROWSER (Magic Trick) */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* 3. BUAT PANAH BARU DENGAN BACKGROUND IMAGE (SVG) */
+  /* Ini membuat panah yang rapi dan bisa kita atur posisinya */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  
+  background-repeat: no-repeat;
+  
+  /* 4. POSISI PANAH (KUNCI JAWABAN ANDA) */
+  /* right 16px center -> Artinya: 16px dari kanan (sama dengan padding kiri), posisinya di tengah vertikal */
+  background-position: right 16px center;
+  
+  /* Ukuran Icon Panah */
+  background-size: 16px;
+  
+  transition: all 0.2s;
+}
+
+.filterSelect:hover, .filterSelect:focus {
+  border-color: #2563eb;
+  /* Opsional: Ubah warna panah jadi biru saat fokus (tapi perlu ganti URL SVG, cukup border saja biasanya sudah oke) */
+}
+
+/* --- GRID SYSTEM (3 KOLOM) --- */
+.gridContainer {
+  display: grid;
+  /* Membuat 3 kolom dengan lebar yang sama */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+
+  /* Agar bisa discroll */
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px; /* Sedikit padding agar bayangan card tidak terpotong */
+  padding-bottom: 20px;
+}
+
+/* Responsiveness: Jika layar mengecil, turun ke 2 atau 1 kolom */
+@media (max-width: 1200px) {
+  .gridContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Scrollbar Custom (Sama seperti sebelumnya) */
+.gridContainer::-webkit-scrollbar {
+  width: 8px;
+}
+.gridContainer::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.gridContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* --- CARD STYLE --- */
+.card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-4px); /* Efek melayang saat hover */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+/* Card Header */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.projectTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+
+.statusBadge {
+  font-size: 0.7rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: capitalize; /* Agar huruf depan besar */
+}
+
+/* Status: Aktif (Biru - Sedang Dikerjakan) */
+.statusAktif { 
+  background: #dbeafe; /* Biru Muda */
+  color: #1d4ed8;      /* Biru Tua */
+}
+
+/* Status: Pending (Kuning/Oranye - Tertunda/Menunggu) */
+.statusPending { 
+  background: #ffedd5; /* Oranye Muda */
+  color: #9a3412;      /* Oranye Tua */
+}
+
+/* Status: Selesai (Hijau - Sudah Beres) */
+.statusSelesai { 
+  background: #dcfce7; /* Hijau Muda */
+  color: #166534;      /* Hijau Tua */
+}
+
+/* Card Body */
+.cardBody {
+  flex: 1;
+  margin-bottom: 16px;
+}
+
+.description {
+  color: #64748b;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin-bottom: 16px;
+
+  /* Membatasi teks agar tidak kepanjangan (maks 2 baris) */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.supervisorInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background-color: #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.supervisorName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.supervisorLabel {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  display: block;
+}
+
+/* Progress Section */
+.progressSection {
+  margin-top: auto; /* Dorong ke bawah */
+}
+
+.progressLabel {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.progressBarBg {
+  width: 100%;
+  height: 8px;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* Footer Button */
+.detailButton {
+  width: 100%;
+  padding: 10px;
+  background: white;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.detailButton:hover {
+  background: #2563eb;
+  color: white;
+}
