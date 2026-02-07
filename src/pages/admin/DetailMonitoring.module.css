@@ -1,4 +1,6 @@
-/* Container Utama */
+/* src/pages/admin/DetailMonitoring.module.css */
+
+/* --- LAYOUT UTAMA --- */
 .container {
   background-color: var(--neutral);
   padding: 2rem;
@@ -8,7 +10,7 @@
   height: calc(89vh - 4rem);
 }
 
-/* Header Section */
+/* HEADER SECTION */
 .header {
   margin-bottom: 24px;
   flex-shrink: 0;
@@ -26,7 +28,7 @@
   font-size: 0.9rem;
 }
 
-/* Controls (Search & Filter) */
+/* CONTROLS (Search & Filter) */
 .controls {
   display: flex;
   gap: 16px;
@@ -49,46 +51,38 @@
 
 .filterSelect {
   padding: 10px 40px 10px 16px;
-  
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   outline: none;
   color: #475569;
   cursor: pointer;
   background-color: white;
-  font-size: 0.9rem; /* Opsional: Agar teks pas */
-
+  font-size: 0.9rem;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-  
   background-repeat: no-repeat;
-  
   background-position: right 16px center;
-  
   background-size: 16px;
-  
   transition: all 0.2s;
 }
 
-.filterSelect:hover, .filterSelect:focus {
+.filterSelect:hover,
+.filterSelect:focus {
   border-color: #2563eb;
 }
 
-/* --- GRID SYSTEM (3 KOLOM) --- */
+/* --- GRID SYSTEM (PROJECT CARDS) --- */
 .gridContainer {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-
   flex: 1;
   overflow-y: auto;
-  padding: 4px; 
+  padding: 4px;
   padding-bottom: 20px;
 }
-
 
 @media (max-width: 1200px) {
   .gridContainer {
@@ -101,7 +95,7 @@
   }
 }
 
-/* Scrollbar Custom (Sama seperti sebelumnya) */
+/* Scrollbar Custom */
 .gridContainer::-webkit-scrollbar {
   width: 8px;
 }
@@ -127,10 +121,11 @@
     transform 0.2s,
     box-shadow 0.2s;
   position: relative;
+  cursor: pointer;
 }
 
 .card:hover {
-  transform: translateY(-4px); 
+  transform: translateY(-4px);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   border-color: #cbd5e1;
 }
@@ -151,28 +146,25 @@
   line-height: 1.4;
 }
 
-
 .statusBadge {
   font-size: 0.7rem;
   padding: 4px 8px;
   border-radius: 12px;
   font-weight: 600;
-  text-transform: capitalize; 
+  text-transform: capitalize;
 }
 
-.statusAktif { 
-  background: #dbeafe; 
-  color: #1d4ed8;      
+.statusAktif {
+  background: #dbeafe;
+  color: #1d4ed8;
 }
-
-.statusPending { 
-  background: #ffedd5; 
-  color: #9a3412;      
+.statusPending {
+  background: #ffedd5;
+  color: #9a3412;
 }
-
-.statusSelesai { 
-  background: #dcfce7; 
-  color: #166534;      
+.statusSelesai {
+  background: #dcfce7;
+  color: #166534;
 }
 
 /* Card Body */
@@ -186,60 +178,15 @@
   font-size: 0.85rem;
   line-height: 1.5;
   margin-bottom: 16px;
-
-  /* Membatasi teks agar tidak kepanjangan (maks 2 baris) */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.supervisorInfo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f8fafc;
-  padding: 8px 12px;
-  border-radius: 8px;
-}
-
-.avatar {
-  width: 32px;
-  height: 32px;
-  background-color: #e2e8f0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #64748b;
-}
-
-.supervisorName {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #334155;
-}
-
-.supervisorLabel {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  display: block;
-}
-
 /* Progress Section */
 .progressSection {
-  margin-top: auto; /* Dorong ke bawah */
-}
-
-.progressLabel {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #475569;
+  margin-top: auto;
 }
 
 .progressBarBg {
@@ -248,7 +195,7 @@
   background-color: #f1f5f9;
   border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .progressBarFill {
@@ -257,25 +204,401 @@
   transition: width 0.5s ease;
 }
 
-/* Footer Button */
-.detailButton {
-  width: 100%;
-  padding: 10px;
+/* --- MODAL STYLES --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
   background: white;
-  border: 1px solid #2563eb;
-  color: #2563eb;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.9rem;
+  width: 100%;
+  max-width: 800px; /* Lebar modal detail */
+  max-height: 90vh; /* Agar tidak melebihi tinggi layar */
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Header Modal */
+.modalHeader {
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background-color: #f8fafc;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #94a3b8;
   cursor: pointer;
+}
+.closeBtn:hover {
+  color: #ef4444;
+}
+
+/* Body Modal */
+.modalBody {
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* --- DETAIL VIEW COMPONENTS --- */
+
+/* Header Detail (Progress) */
+.wireframeDetailHeader {
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.headerLeft {
+  color: #1e293b;
+}
+.headerRight {
+  text-align: right;
+  min-width: 150px;
+}
+.headerRight small {
+  display: block;
+  margin-top: 6px;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.wfProgressContainer {
+  background-color: #e2e8f0;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  width: 100%;
+}
+.wfProgressFill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+
+/* Grid Informasi Detail */
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 768px) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sectionTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+/* Info Rows */
+.infoRow {
+  margin-bottom: 16px;
+}
+.infoLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+.infoText {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.dateBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #475569;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Statistik Tugas */
+.taskStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.taskStatBox {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  background-color: #f8fafc;
+}
+.statNumber {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.statLabel {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Anggota Tim */
+.memberTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.memberBadge {
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Timeline */
+.timelineContainer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* --- EVALUASI VIEW COMPONENTS --- */
+
+/* Snapshot Box (Header Evaluasi) */
+.snapshotBox {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 24px;
+}
+
+.snapshotLeft {
+  flex: 1;
+  border-right: 1px solid #e2e8f0;
+  padding-right: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.snapshotStats {
+  flex: 1.5;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.statItem {
+  text-align: center;
+}
+.statValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+/* Form Elements Evaluasi */
+.formGroup {
+  margin-bottom: 20px;
+}
+.formLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.categoryGroup {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+.categoryChip {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
   transition: all 0.2s;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+}
+.categoryChip:hover {
+  background: #f1f5f9;
+}
+
+.chipActiveTeguran {
+  background-color: #fef2f2;
+  border-color: #fca5a5;
+  color: #dc2626;
+}
+.chipActiveArahan {
+  background-color: #eff6ff;
+  border-color: #93c5fd;
+  color: #2563eb;
+}
+.chipActiveApresiasi {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+  color: #16a34a;
+}
+
+.textArea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  outline: none;
+  transition: border 0.2s;
+}
+.textArea:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Action Row (Tindak Lanjut & Prioritas) */
+.actionRow {
+  display: flex;
+  gap: 20px;
+  background: #fafafa;
+  padding: 16px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+.actionCol {
+  flex: 1;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 
-.detailButton:hover {
-  background: #2563eb;
+.selectInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+/* Button Group */
+.btnGroup {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btnPrimary {
+  background: #4f46e5;
   color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btnPrimary:hover {
+  background: #4338ca;
+}
+
+.btnSecondary {
+  background: white;
+  border: 1px solid #cbd5e1;
+  color: #64748b;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btnSecondary:hover {
+  background: #f1f5f9;
+  color: #334155;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

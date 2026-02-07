@@ -1,20 +1,40 @@
-/* src/components/Header.module.css */
+/* src/layouts/Header.module.css */
+
+/* --- HEADER CONTAINER --- */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
   padding: 1rem 2rem;
-  /* Agar header nempel di atas saat scroll (Sticky) opsional */
-  position: sticky; 
+  position: sticky;
   top: 0;
-  z-index: 10;
-  background-color: var(--neutral); /* Match background body agar seamless */
+  z-index: 100;
+  background-color: var(--neutral);
   border-radius: 1.8rem;
-  /* Atau gunakan backdrop-filter blur jika ingin efek kaca */
 }
 
-/* SEARCH */
+/* --- SECTION: LEFT (Greeting / Search) --- */
+.leftSection {
+  flex: 1; /* Agar bisa expand jika needed */
+  display: flex;
+  align-items: center;
+}
+
+/* Typography untuk Greeting (Supervisor/Staff) */
+.title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0;
+}
+.subtitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 0;
+}
+
+/* Search Bar (Admin) */
 .searchContainer {
   position: relative;
   display: flex;
@@ -28,118 +48,161 @@
   border: none;
   border-radius: 8px;
   padding: 1.2rem 1.5rem;
-  padding-right: 4rem; /* Ruang untuk icon search */
+  padding-right: 4rem;
   outline: none;
   font-family: inherit;
-  font-weight: var(--fw-semibold);
-  font-size: var(--fs-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
   background-color: #fff;
   box-shadow: 0 2px 5px rgba(0,0,0,0.02);
   transition: all 0.3s ease;
 }
-
 .searchInput:focus {
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .searchBtn {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px;
+  position: absolute; right: 10px; background: none; border: none;
+  cursor: pointer; color: #64748b; padding: 5px;
+  display: flex; align-items: center; justify-content: center;
 }
 
-/* ACTIONS */
-.actionGroup {
+/* --- SECTION: RIGHT (Actions & Profile) --- */
+.rightSection {
   display: flex;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 1.5rem; /* Jarak antar elemen kanan */
+}
+
+/* Action Buttons (Admin: Status/Calendar) */
+.actionGroup {
+  display: flex; gap: 1.5rem; align-items: center;
 }
 
 .actionItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #fff;
-  padding: 1rem 1.5rem;
-  min-width: 160px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-  color: var(--color-text-main);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-  transition: all 0.2s ease;
+  display: flex; align-items: center; justify-content: space-between;
+  background-color: #fff; padding: 1rem 1.5rem; min-width: 160px;
+  border-radius: 8px; cursor: pointer;
+  font-size: 0.9rem; font-weight: 600; color: #334155;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: all 0.2s ease;
 }
-
 .actionItem:hover {
-  background-color: #f8f9fa;
-  transform: translateY(-2px);
+  background-color: #f8f9fa; transform: translateY(-2px);
 }
 
-/* USER PROFILE */
-.userProfile {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.notification {
+/* --- NOTIFICATION SYSTEM (Shared) --- */
+.notifWrapper {
   position: relative;
-  cursor: pointer;
-  color: var(--color-secondary);
-  display: flex;
-  align-items: center;
 }
 
-.notifDot {
-  position: absolute;
-  top: 0;
-  right: 2px;
-  width: 8px;
-  height: 8px;
-  background-color: #ef4444; /* Merah */
+/* Tombol Lonceng Bulat */
+.notifBtn {
+  background: white;
+  border: 1px solid #e2e8f0; /* Default border halus */
+  width: 40px; height: 40px;
   border-radius: 50%;
-  border: 1px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #64748b;
+  transition: all 0.2s; position: relative;
+}
+.notifBtn:hover {
+  background-color: #f1f5f9; color: #2563eb; border-color: #cbd5e1;
 }
 
-.userInfo {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  cursor: pointer;
+/* Badge Merah (Counter) */
+.badge {
+  position: absolute; top: -2px; right: -2px;
+  background-color: #ef4444; color: white;
+  font-size: 0.65rem; font-weight: 700;
+  min-width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid white;
+}
+
+/* Dropdown Container */
+.dropdown {
+  position: absolute; top: 50px; right: -10px;
+  width: 340px; background: white; border-radius: 12px;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0; overflow: hidden;
+  animation: slideDown 0.2s ease-out; z-index: 200;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdownHeader {
+  padding: 14px 20px; border-bottom: 1px solid #f1f5f9;
+  font-weight: 700; color: #1e293b; font-size: 0.95rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background-color: #fff;
+}
+
+.dropdownList { max-height: 320px; overflow-y: auto; }
+
+/* Item Notifikasi */
+.notifItem {
+  padding: 14px 20px; border-bottom: 1px solid #f8fafc;
+  display: flex; gap: 14px; align-items: flex-start;
+  transition: background 0.2s; cursor: pointer;
+}
+.notifItem:hover { background-color: #f8fafc; }
+.unreadItem { background-color: #eff6ff; } /* Highlight item baru */
+
+/* Icon Notif Bulat */
+.itemIcon {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 1rem;
+  /* Default Info Style */
+  background-color: #eff6ff; color: #2563eb;
+}
+/* Variant Icons */
+.iconWarning { background-color: #fef2f2; color: #ef4444; }
+.iconSuccess { background-color: #f0fdf4; color: #16a34a; }
+
+/* Content Text */
+.itemContent strong {
+  display: block; font-size: 0.9rem; color: #1e293b; margin-bottom: 4px;
+}
+.itemContent p {
+  margin: 0; font-size: 0.85rem; color: #64748b; line-height: 1.4;
+}
+.itemTime {
+  display: block; font-size: 0.75rem; color: #94a3b8; margin-top: 6px;
+}
+
+.dropdownFooter {
+  padding: 12px; text-align: center; font-size: 0.85rem;
+  color: #2563eb; font-weight: 600; background-color: #f8fafc;
+  cursor: pointer; border-top: 1px solid #e2e8f0;
+}
+.dropdownFooter:hover { background-color: #eef2ff; }
+
+
+/* --- USER PROFILE (Shared) --- */
+.userProfile {
+  display: flex; align-items: center; gap: 1rem; cursor: pointer;
 }
 
 .avatar {
-  width: 40px;
-  height: 40px;
-  background-color: #e0f2fe; /* Biru muda sekali */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-primary);
+  width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  /* Default Style (Admin Biru Muda, SV Indigo Muda) */
+  background-color: #e0f2fe; color: #0284c7; 
+  border: 2px solid white; box-shadow: 0 0 0 2px #e0f2fe;
 }
 
-.userDetails {
-  display: flex;
-  flex-direction: column;
+/* Variant Avatar untuk Supervisor/Staff (Indigo) - Opsional override */
+.avatarIndigo {
+  background-color: #eef2ff; color: #4f46e5; box-shadow: 0 0 0 2px #e0e7ff;
 }
 
+.userDetails { display: flex; flex-direction: column; }
 .userName {
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-semibold);
-  color: var(--color-text-main);
-  line-height: 1.2;
-  margin: 0 0 0.4rem 0;
+  font-size: 0.9rem; font-weight: 600; color: #334155;
+  line-height: 1.2; margin: 0 0 0.2rem 0;
 }
-
-.userEmail {
-  font-size: 1rem; /* Kecil */
-  color: var(--color-text-faded);
-}
+.userEmail { font-size: 0.8rem; color: #94a3b8; }

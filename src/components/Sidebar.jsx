@@ -16,7 +16,7 @@ const Sidebar = () => {
     { path: '/admin/dashboard', name: 'Dashboard', icon: <PieChart size={20}  strokeWidth={2.5}/> },
     { path: '/admin/users', name: 'Manajemen User', icon: <UserCog size={20} strokeWidth={2.5}/> },
     { path: '/admin/projects', name: 'Daftar Proyek', icon: <ListTodo size={20} strokeWidth={2.5}/> },
-    { path: '/admin/monitoring', name: 'Detail & Monitoring', icon: <Activity size={20} strokeWidth={2.5}/> },
+    { path: '/admin/monitoring', name: 'Monitoring & Evaluasi', icon: <Activity size={20} strokeWidth={2.5}/> },
     { path: '/admin/reports', name: 'Laporan Proyek', icon: <FileText size={20} strokeWidth={2.5}/> },
   ];
 

@@ -1,0 +1,405 @@
+/* src/pages/staff/MyTasks.module.css */
+
+/* --- 1. LAYOUT STANDAR --- */
+.container {
+  background-color: var(--neutral, #fff);
+  padding: 2rem;
+  border-radius: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  height: calc(89vh - 4rem);
+  overflow: hidden;
+}
+
+/* Header */
+.header {
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+.subtitle {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* Controls (Search & Filter) */
+.controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-shrink: 0;
+}
+.searchWrapper {
+  position: relative;
+  flex: 1;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  transition: all 0.2s;
+}
+.searchInput:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.filterSelect {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+  min-width: 180px;
+  background: white;
+  cursor: pointer;
+}
+
+/* --- 2. GRID TUGAS --- */
+.taskGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  overflow-y: auto;
+  padding-right: 8px;
+  padding-bottom: 20px;
+}
+
+/* Custom Scrollbar */
+.taskGrid::-webkit-scrollbar {
+  width: 6px;
+}
+.taskGrid::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+
+/* --- 3. DESIGN KARTU TUGAS --- */
+.taskCard {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+  cursor: pointer;
+}
+.taskCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+  border-color: #cbd5e1;
+}
+
+/* Header Kartu (Context) */
+.cardProjectCtx {
+  background: #f8fafc;
+  padding: 12px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.projectName {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.projectStatusDot {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Body Kartu */
+.cardBody {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.taskTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.4;
+}
+.supervisorInfo {
+  font-size: 0.9rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Footer Kartu */
+.cardFooter {
+  padding: 16px 20px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.deadline {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Badge Status */
+.badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+.statusTodo {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+.statusProgress {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #dbeafe;
+}
+.statusRevisi {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fee2e2;
+}
+.statusPending {
+  background: #fff7ed;
+  color: #c2410c;
+  border: 1px solid #ffedd5;
+}
+
+/* --- 4. MODAL & OVERLAY --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
+.modalContent {
+  background: white;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modalTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.modalBody {
+  padding: 24px;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
+/* --- 5. INSTRUKSI & ALERT (FITUR BARU) --- */
+
+/* Kotak Instruksi (Kuning/Orange) */
+.instructionBox {
+  background-color: #fff7ed;
+  border: 1px solid #fdba74;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.instructionTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #c2410c;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.todoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.todoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #431407;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ffedd5;
+}
+.todoIcon {
+  color: #f97316;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Kotak Revisi (Merah) */
+.revisionBox {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.revisionTitle {
+  margin: 0 0 4px 0;
+  color: #dc2626;
+  fontsize: 0.95rem;
+  font-weight: 700;
+}
+.revisionText {
+  margin: 0;
+  color: #7f1d1d;
+  fontsize: 0.9rem;
+  lineheight: 1.5;
+}
+
+/* Divider */
+.divider {
+  height: 1px;
+  background-color: #e2e8f0;
+  margin: 0 -24px 24px -24px;
+}
+
+/* --- 6. FORM ELEMENTS --- */
+.sectionLabel {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #334155;
+  font-size: 1rem;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+.formLabel {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.textArea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border 0.2s;
+}
+.textArea:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* File Upload */
+.fileUploadBox {
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+.fileUploadBox:hover {
+  border-color: #4f46e5;
+  background: #eef2ff;
+}
+.fileName {
+  margin-top: 10px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+/* Submit Button */
+.submitBtn {
+  width: 100%;
+  padding: 14px;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.submitBtn:hover {
+  background: #4338ca;
+}
+.submitBtn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}

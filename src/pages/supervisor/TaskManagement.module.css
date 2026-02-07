@@ -1,0 +1,205 @@
+/* src/pages/supervisor/TaskManagement.module.css */
+
+/* --- LAYOUT UTAMA --- */
+.container {
+  background-color: var(--neutral, #fff);
+  padding: 2rem;
+  border-radius: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  height: calc(89vh - 4rem); /* Pastikan tinggi container pas */
+  overflow: hidden; /* Mencegah double scrollbar */
+}
+
+/* HEADER & CONTROLS (Tetap Sama) */
+.header { margin-bottom: 24px; flex-shrink: 0; }
+.title { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+.subtitle { color: #64748b; font-size: 0.9rem; }
+
+.controls { display: flex; gap: 16px; margin-bottom: 24px; flex-shrink: 0; }
+.searchWrapper { position: relative; flex: 1; }
+.searchIcon { position: absolute; left: 12px; top: 12px; color: #94a3b8; }
+.searchInput {
+  width: 100%; padding: 12px 12px 12px 40px; border-radius: 10px;
+  border: 1px solid #cbd5e1; outline: none; transition: all 0.2s;
+}
+.searchInput:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+/* --- GRID SYSTEM (PERBAIKAN SCROLL) --- */
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  
+  /* Agar area scroll mengisi sisa ruang */
+  flex: 1; 
+  overflow-y: auto; 
+  
+  /* Padding extra di bawah agar kartu terakhir tidak kepotong */
+  padding: 4px;
+  padding-bottom: 100px; 
+}
+
+/* Scrollbar Styling */
+.gridContainer::-webkit-scrollbar { width: 6px; }
+.gridContainer::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+@media (max-width: 1200px) { .gridContainer { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .gridContainer { grid-template-columns: 1fr; } }
+
+/* --- CARD DESIGN (PERBAIKAN LAYOUT) --- */
+.card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 0;
+  
+  /* Flex Column agar Footer selalu di bawah */
+  display: flex;
+  flex-direction: column;
+  
+  /* Opsional: Tetapkan tinggi minimum agar seragam */
+  min-height: 320px; 
+  
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px -5px rgba(0,0,0,0.05);
+  border-color: #cbd5e1;
+}
+
+/* 1. Header Card */
+.cardContext {
+  background: #f8fafc; padding: 12px 20px; border-bottom: 1px solid #f1f5f9;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.categoryLabel {
+  font-size: 0.75rem; font-weight: 700; color: #64748b;
+  text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center;
+}
+.statusBadge {
+  font-size: 0.7rem; padding: 2px 8px; border-radius: 4px; font-weight: 700;
+  text-transform: capitalize; border: 1px solid;
+}
+.aktif { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+.pending { background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+.selesai { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+
+/* 2. Body Card (PERBAIKAN ISI) */
+.cardBody {
+  padding: 20px;
+  
+  /* Flex Grow agar mendorong footer ke bawah jika konten sedikit */
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.projectTitle {
+  font-size: 1.15rem; font-weight: 700; color: #1e293b; line-height: 1.3; margin: 0;
+  
+  /* Batasi judul maks 2 baris */
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.description {
+  color: #64748b; font-size: 0.85rem; line-height: 1.5; margin-bottom: 8px;
+  
+  /* PENTING: Batasi deskripsi maks 3 baris agar kartu tidak kepanjangan */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.supervisorInfo {
+  font-size: 0.85rem; color: #64748b; display: flex; align-items: center; gap: 6px;
+  margin-top: auto; /* Dorong ke bawah di dalam body */
+}
+
+/* 3. Progress Area */
+.progressArea { padding: 0 20px 16px 20px; }
+.progressBarBg { width: 100%; height: 6px; background-color: #f1f5f9; border-radius: 4px; overflow: hidden; }
+.progressBarFill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+
+/* 4. Footer Card (PERBAIKAN POSISI) */
+.cardFooter {
+  padding: 12px 20px;
+  border-top: 1px solid #f1f5f9;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  /* Memastikan footer tidak mengecil */
+  flex-shrink: 0; 
+}
+
+.deadline {
+  font-size: 0.85rem; font-weight: 500; color: #ef4444; display: flex; align-items: center; gap: 6px;
+}
+
+.createBtn {
+  background: #4f46e5; color: white; border: none; padding: 8px 16px;
+  border-radius: 8px; font-weight: 600; font-size: 0.8rem; cursor: pointer;
+  display: flex; align-items: center; gap: 6px; transition: background 0.2s;
+}
+.createBtn:hover { background: #4338ca; }
+
+/* --- MODAL STYLES (Tetap Sama) --- */
+/* Pastikan z-index modal lebih tinggi dari header */
+.modalOverlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); 
+  z-index: 2000; /* Z-INDEX TINGGI */
+  display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); padding: 20px;
+}
+.modalContent {
+  background: white; border-radius: 16px; width: 100%; max-width: 700px;
+  height: auto; max-height: 85vh; display: flex; flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); animation: slideIn 0.25s ease-out;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.modalHeader {
+  padding: 20px 30px; border-bottom: 1px solid #e2e8f0; background: #f8fafc;
+  display: flex; justify-content: space-between; align-items: flex-start; border-radius: 16px 16px 0 0;
+}
+.modalTitle { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+.closeButton { background: none; border: none; font-size: 1.5rem; color: #64748b; cursor: pointer; }
+.selectedProjectBadge {
+  display: inline-block; background-color: #e0e7ff; color: #4338ca;
+  padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; border: 1px solid #c7d2fe;
+}
+.modalBody { padding: 30px; overflow-y: auto; flex: 1; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.fullWidth { grid-column: span 2; }
+.formGroup { margin-bottom: 0; }
+.formLabel { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; font-size: 0.9rem; }
+.formInput, .formSelect, .formTextarea {
+  width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px;
+  font-size: 1rem; outline: none; background: #fff;
+}
+.formInput:focus, .formSelect:focus, .formTextarea:focus {
+  border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+.formTextarea { min-height: 100px; resize: vertical; }
+.modalFooter {
+  padding: 20px 30px; border-top: 1px solid #e2e8f0; background: #f8fafc;
+  display: flex; justify-content: flex-end; gap: 12px; border-radius: 0 0 16px 16px;
+}
+.cancelBtn {
+  padding: 12px 24px; border: 1px solid #cbd5e1; background: white; color: #475569;
+  border-radius: 8px; font-weight: 600; cursor: pointer;
+}
+.saveBtn {
+  padding: 12px 24px; background: #4f46e5; color: white; border: none;
+  border-radius: 8px; font-weight: 600; cursor: pointer;
+}

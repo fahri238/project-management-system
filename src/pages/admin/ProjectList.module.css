@@ -75,35 +75,66 @@
   gap: 8px;
   transition: background 0.2s;
 }
-.addButton:hover { background: #1d4ed8; }
+.addButton:hover {
+  background: #1d4ed8;
+}
 
 /* Table Container (Scroll Logic) */
 .tableContainer {
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
-  flex: 1;              /* Fill remaining space */
-  overflow-y: auto;     /* Scroll vertikal */
+  flex: 1; /* Fill remaining space */
+  overflow-y: auto; /* Scroll vertikal */
   min-height: 0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 /* Custom Scrollbar (Tanpa Tombol) */
-.tableContainer::-webkit-scrollbar-button { display: none; }
-.tableContainer::-webkit-scrollbar { width: 8px; height: 8px; }
-.tableContainer::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
-.tableContainer::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
-.tableContainer::-webkit-scrollbar-track { background: transparent; }
+.tableContainer::-webkit-scrollbar-button {
+  display: none;
+}
+.tableContainer::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.tableContainer::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.tableContainer::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+.tableContainer::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 /* Table Elements */
-.table { width: 100%; border-collapse: collapse; text-align: left; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
 .table th {
-  position: sticky; top: 0; z-index: 10;
-  background: #f8fafc; padding: 16px; font-weight: 600; color: #475569;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f8fafc;
+  padding: 16px;
+  font-weight: 600;
+  color: #475569;
   border-bottom: 1px solid #e2e8f0;
 }
-.table td { padding: 16px; border-bottom: 1px solid #f1f5f9; color: #334155; }
-.table tr:hover { background-color: #f8fafc; }
+.table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+.table tr:hover {
+  background-color: #f8fafc;
+}
 
 /* --- BADGES STATUS PROYEK --- */
 .statusBadge {
@@ -117,15 +148,15 @@
 
 .statusActive {
   background: #dcfce7; /* Hijau Muda */
-  color: #166534;      /* Hijau Tua */
+  color: #166534; /* Hijau Tua */
 }
 .statusPending {
   background: #ffedd5; /* Orange Muda */
-  color: #9a3412;      /* Orange Tua */
+  color: #9a3412; /* Orange Tua */
 }
 .statusCompleted {
   background: #e2e8f0; /* Abu/Biru Muda */
-  color: #475569;      /* Abu Tua */
+  color: #475569; /* Abu Tua */
 }
 
 /* --- ACTION BUTTONS (Sama dengan UserManagement) --- */
@@ -148,14 +179,263 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-.detailBtn:hover { background-color: #2563eb; color: white; border-color: #2563eb; }
+.detailBtn:hover {
+  background-color: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
 
 /* Icon Only */
 .iconBtn {
-  border: none; background: none; cursor: pointer; padding: 4px;
-  border-radius: 4px; font-size: 1.1rem; display: flex; align-items: center;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
 }
-.editBtn { color: #f59e0b; }
-.editBtn:hover { background-color: #fef3c7; }
-.deleteBtn { color: #ef4444; }
-.deleteBtn:hover { background-color: #fee2e2; }
+.editBtn {
+  color: #f59e0b;
+}
+.editBtn:hover {
+  background-color: #fef3c7;
+}
+.deleteBtn {
+  color: #ef4444;
+}
+.deleteBtn:hover {
+  background-color: #fee2e2;
+}
+
+/* --- MODAL STYLES  --- */
+/* ... CSS Table & Container (JANGAN DIUBAH) ... */
+
+/* --- MODAL STYLES (FIXED HEIGHT & SCROLLABLE BODY) --- */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Pastikan modal di tengah layar */
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+  padding: 20px; /* Jaga jarak aman dari tepi layar */
+}
+
+.modalContent {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 800px;
+
+  /* KUNCI AGAR PAS DI LAYAR: */
+  height: auto;
+  max-height: 85vh; /* Maksimal 85% tinggi layar, sisanya margin */
+
+  display: flex;
+  flex-direction: column; /* Susun ke bawah */
+
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 1. Header (Statik / Tidak Bergerak) */
+.modalHeader {
+  background-color: #f8fafc;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 16px 16px 0 0;
+  flex-shrink: 0; /* Jangan mengecil */
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #64748b;
+  cursor: pointer;
+}
+.closeButton:hover {
+  color: #ef4444;
+}
+
+/* 2. FORM CONTAINER (Penting agar layout flex bekerja) */
+.modalContent form {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Mencegah scroll ganda */
+  flex: 1; /* Mengisi sisa ruang di bawah header */
+}
+
+/* 3. BODY (Area yang BISA DI-SCROLL) */
+.modalBody {
+  padding: 30px;
+  overflow-y: auto; /* Scroll hanya muncul di sini! */
+  flex: 1; /* Mengisi ruang tengah */
+
+  /* Agar scrollbar rapi */
+  scrollbar-width: thin;
+}
+
+/* Custom Scrollbar untuk Modal Body */
+.modalBody::-webkit-scrollbar {
+  width: 8px;
+}
+.modalBody::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* 4. FOOTER (Statik / Selalu terlihat di bawah) */
+.modalFooter {
+  padding: 20px 30px;
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0; /* Jangan mengecil / terdorong */
+  border-radius: 0 0 16px 16px;
+}
+
+/* --- FORM ELEMENTS (Sama seperti sebelumnya) --- */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.fullWidth {
+  grid-column: span 2;
+}
+.formGroup {
+  margin-bottom: 0;
+}
+.formLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #334155;
+  font-size: 0.9rem;
+}
+.formInput,
+.formSelect,
+.formTextarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  font-family: inherit;
+  background-color: #fff;
+}
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+.formTextarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Checkbox Styles */
+.checkboxContainer {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 16px;
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: #f8fafc;
+}
+.checkboxGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+.checkboxItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #334155;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+.checkboxItem:hover {
+  background-color: #e2e8f0;
+}
+.checkboxInput {
+  accent-color: #2563eb;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Buttons */
+.cancelBtn {
+  padding: 12px 24px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #475569;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.cancelBtn:hover {
+  background: #f1f5f9;
+}
+.saveBtn {
+  padding: 12px 24px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.saveBtn:hover {
+  background: #1d4ed8;
+}
+
+/* Responsive: Jika layar HP, ubah jadi 1 kolom */
+@media (max-width: 768px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+  .fullWidth {
+    grid-column: span 1;
+  }
+  .modalContent {
+    height: 100%;
+    max-height: 100%;
+    border-radius: 0;
+  } /* Fullscreen di HP */
+}
