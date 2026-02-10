@@ -1,30 +1,62 @@
 // src/components/Sidebar.jsx
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import { 
-  PieChart,      // Pengganti bi-pie-chart
-  UserCog,       // Pengganti bi-person-gear
-  ListTodo,      // Pengganti bi-list-check
-  Activity,      // Pengganti bi-speedometer
-  FileText,      // Pengganti bi-file-earmark
-  LogOut         // Pengganti bi-box-arrow-right
-} from 'lucide-react';
-import styles from '../layouts/Sidebar.module.css';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  PieChart,
+  UserCog,
+  ListTodo,
+  Activity,
+  FileText,
+  LogOut,
+} from "lucide-react";
+import styles from "../layouts/Sidebar.module.css";
+
+// 1. IMPORT LOGIN CONTROLLER
+import { LoginController } from "../controllers/LoginController";
 
 const Sidebar = () => {
   const menuItems = [
-    { path: '/admin/dashboard', name: 'Dashboard', icon: <PieChart size={20}  strokeWidth={2.5}/> },
-    { path: '/admin/users', name: 'Manajemen User', icon: <UserCog size={20} strokeWidth={2.5}/> },
-    { path: '/admin/projects', name: 'Daftar Proyek', icon: <ListTodo size={20} strokeWidth={2.5}/> },
-    { path: '/admin/monitoring', name: 'Monitoring & Evaluasi', icon: <Activity size={20} strokeWidth={2.5}/> },
-    { path: '/admin/reports', name: 'Laporan Proyek', icon: <FileText size={20} strokeWidth={2.5}/> },
+    {
+      path: "/admin/dashboard",
+      name: "Dashboard",
+      icon: <PieChart size={20} strokeWidth={2.5} />,
+    },
+    {
+      path: "/admin/users",
+      name: "Manajemen User",
+      icon: <UserCog size={20} strokeWidth={2.5} />,
+    },
+    {
+      path: "/admin/projects",
+      name: "Daftar Proyek",
+      icon: <ListTodo size={20} strokeWidth={2.5} />,
+    },
+    {
+      path: "/admin/monitoring",
+      name: "Monitoring & Evaluasi",
+      icon: <Activity size={20} strokeWidth={2.5} />,
+    },
+    {
+      path: "/admin/reports",
+      name: "Laporan Proyek",
+      icon: <FileText size={20} strokeWidth={2.5} />,
+    },
   ];
+
+  // 2. FUNGSI HANDLE LOGOUT
+  const handleLogout = () => {
+    // Tambahkan konfirmasi agar user tidak tidak sengaja ter-logout
+    if (window.confirm("Apakah Anda yakin ingin keluar dari sistem?")) {
+      LoginController.logout();
+      // LoginController akan menghapus session dan redirect ke halaman login
+    }
+  };
 
   return (
     <aside className={styles.sidebar}>
       {/* LOGO */}
       <h2 className={styles.logo}>SAGARA AI</h2>
-      
+
       {/* LABEL MENU */}
       <p className={styles.label}>MENU</p>
 
@@ -33,9 +65,9 @@ const Sidebar = () => {
         <ul className={styles.menu}>
           {menuItems.map((item) => (
             <li key={item.path}>
-              <NavLink 
+              <NavLink
                 to={item.path}
-                className={({ isActive }) => 
+                className={({ isActive }) =>
                   isActive ? `${styles.link} ${styles.active}` : styles.link
                 }
               >
@@ -47,8 +79,20 @@ const Sidebar = () => {
 
           {/* LOGOUT (Item Terakhir) */}
           <li className={styles.logoutItem}>
-            <button className={styles.link} style={{ width: '100%', border: 'none', background: 'none' }}>
-              <span className={styles.icon}><LogOut size={20} strokeWidth={2.5}/></span>
+            {/* 3. PASANG EVENT ONCLICK DISINI */}
+            <button
+              className={styles.link}
+              style={{
+                width: "100%",
+                border: "none",
+                background: "none",
+                cursor: "pointer",
+              }}
+              onClick={handleLogout}
+            >
+              <span className={styles.icon}>
+                <LogOut size={20} strokeWidth={2.5} />
+              </span>
               Logout
             </button>
           </li>

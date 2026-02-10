@@ -1,6 +1,6 @@
 // src/components/ui/StatCard.jsx
 import React from 'react';
-import { ArrowUpRight, TrendingUp, TrendingDown } from 'lucide-react'; // <--- Import Icon Baru
+import { ArrowUpRight } from 'lucide-react';
 
 const styles = {
   card: {
@@ -13,7 +13,9 @@ const styles = {
     justifyContent: 'center',
     gap: '0.5rem',
     flex: 1,
-    minWidth: '200px'
+    minWidth: '200px',
+    transition: 'transform 0.2s, box-shadow 0.2s', // Animasi halus
+    cursor: 'pointer' // Tanda bisa diklik
   },
   
   header: {
@@ -42,32 +44,32 @@ const styles = {
     lineHeight: 1
   },
 
-  status: {
-    fontSize: '1rem',
+  footer: {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
+    fontSize: '0.85rem',
     margin: 0,
-    fontWeight: 500 // Sedikit tebal agar jelas
+    padding: 0
+  },
+
+  trendText: {
+    fontWeight: '500'
   },
 
   icon: {
-    cursor: 'pointer',
-    color: 'var(--color-secondary)',
-    transform: 'scale(0.8)'
+    color: 'var(--color-text-muted)'
   }
 };
 
-const StatCard = ({ title, value, trend, isActive }) => {
+const StatCard = ({ title, value, trend, isActive, onClick }) => {
   // 1. DETEKSI LOGIKA TREND
-  // Kita cek apakah teks mengandung kata "meningkat" atau "naik"
   const isTrendingUp = trend.toLowerCase().includes('meningkat') || trend.toLowerCase().includes('naik');
 
-  // 2. TENTUKAN WARNA STATUS (Hijau jika naik, Merah jika turun)
-  // Note: Jika kartu sedang Active (Biru), warna status dipaksa jadi putih terang (#e0f2fe)
+  // 2. TENTUKAN WARNA STATUS
   const statusColor = isActive 
     ? '#e0f2fe' 
-    : (isTrendingUp ? '#10b981' : '#ef4444'); // Hijau : Merah
+    : (isTrendingUp ? '#10b981' : '#ef4444');
 
   // 3. Style Override untuk Kartu Aktif
   const cardStyle = isActive 
@@ -78,7 +80,19 @@ const StatCard = ({ title, value, trend, isActive }) => {
   const iconStyle = isActive ? { color: '#fff' } : styles.icon;
 
   return (
-    <div style={cardStyle}>
+    <div 
+      style={cardStyle} 
+      onClick={onClick} // Tambahkan event klik
+      className="stat-card-hover" // Class untuk CSS eksternal (efek hover)
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-5px)';
+        e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.02)';
+      }}
+    >
       <div style={styles.header}>
         <h5 style={{ ...styles.title, ...textStyle }}>{title}</h5>
         <ArrowUpRight size={20} style={iconStyle} />
@@ -86,16 +100,19 @@ const StatCard = ({ title, value, trend, isActive }) => {
       
       <p style={{ ...styles.value, ...textStyle }}>{value}</p>
       
-      {/* BAGIAN STATUS DINAMIS */}
-      <div style={{ ...styles.status, color: statusColor }}>
-        {/* Render Icon Sesuai Kondisi */}
-        {isTrendingUp ? (
-          <TrendingUp size={16} /> 
-        ) : (
-          <TrendingDown size={16} />
-        )}
-        
-        <span>{trend}</span>
+      <div style={styles.footer}>
+        <span style={{ 
+          color: statusColor, 
+          backgroundColor: isActive ? 'rgba(255,255,255,0.2)' : (isTrendingUp ? '#ecfdf5' : '#fef2f2'),
+          padding: '2px 8px',
+          borderRadius: '12px',
+          ...styles.trendText
+        }}>
+          {isTrendingUp ? '↗' : '↘'} 
+        </span>
+        <span style={{ color: isActive ? '#e0f2fe' : 'var(--color-text-muted)', fontSize: '0.8rem' }}>
+          {trend}
+        </span>
       </div>
     </div>
   );

@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 
+// 1. IMPORT CONTROLLER (Pastikan path-nya sesuai)
+import { LoginController } from "../../controllers/LoginController";
+
 const Login = () => {
   const navigate = useNavigate();
 
@@ -10,36 +13,46 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+  // 2. TAMBAH STATE LOADING
+  const [isLoading, setIsLoading] = useState(false);
 
-    // 1. Validasi Input Kosong
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(""); // Reset error lama
+
+    // Validasi Input Kosong
     if (!username || !password) {
       setError("Username dan Password wajib diisi!");
       return;
     }
 
-    const userLower = username.toLowerCase();
+    // 3. MULAI PROSES LOGIN DENGAN CONTROLLER
+    setIsLoading(true); // Aktifkan mode loading
 
-    // 2. Logika Routing Berdasarkan Role (Simulasi)
-    if (userLower.includes("admin")) {
-      // Role: Admin
-      navigate("/admin/dashboard");
-    } else if (userLower.includes("spv") || userLower.includes("supervisor")) {
-      // Role: Supervisor
-      navigate("/supervisor/dashboard");
-    } else if (userLower.includes("staff")) {
-      // Role: Staff
-      navigate("/staff/dashboard");
-    } else {
-      // Fallback jika username tidak dikenali
-      setError("Akun tidak ditemukan. Coba: admin, spv, atau staff.");
+    try {
+      // Panggil Controller (ini proses async/tunggu sebentar)
+      const result = await LoginController.login(username, password);
+
+      if (result.success) {
+        // Arahkan sesuai Role yang dikembalikan Controller
+        const role = result.user.role;
+
+        if (role === "admin") navigate("/admin/dashboard");
+        else if (role === "supervisor") navigate("/supervisor/dashboard");
+        else if (role === "staff") navigate("/staff/dashboard");
+      }
+    } catch (err) {
+      // Jika Gagal (Password salah / User tidak ada)
+      setError(err.message);
+    } finally {
+      // Selesai loading (baik sukses maupun gagal)
+      setIsLoading(false);
     }
   };
 
   return (
     <div className={styles.container}>
-      {/* BAGIAN KIRI: BRANDING (Indigo Background) */}
+      {/* BAGIAN KIRI: BRANDING */}
       <div className={styles.leftSide}>
         <div className={styles.contentLeft}>
           <h1 className={styles.brandTitle}>SAGARA AI</h1>
@@ -49,7 +62,6 @@ const Login = () => {
             terintegrasi.
           </p>
         </div>
-        {/* Dekorasi visual */}
         <div className={styles.circleDecoration}></div>
       </div>
 
@@ -78,6 +90,7 @@ const Login = () => {
                 className={styles.input}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading} // Matikan input saat loading
               />
             </div>
 
@@ -93,34 +106,36 @@ const Login = () => {
                 className={styles.input}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading} // Matikan input saat loading
               />
             </div>
 
-            <button type="submit" className={styles.loginButton}>
-              Masuk Dashboard
+            {/* TOMBOL LOGIN DINAMIS */}
+            <button
+              type="submit"
+              className={styles.loginButton}
+              disabled={isLoading} // Matikan tombol saat loading
+              style={{
+                opacity: isLoading ? 0.7 : 1,
+                cursor: isLoading ? "wait" : "pointer",
+              }}
+            >
+              {isLoading ? "Memproses..." : "Masuk Dashboard"}
             </button>
           </form>
 
-          {/* CHEAT SHEET (Untuk memudahkan Demo/Testing) */}
-          {/* <div className={styles.demoHint}>
+          <div
+            style={{
+              marginTop: "20px",
+              fontSize: "0.85rem",
+              color: "#64748b",
+              textAlign: "center",
+            }}
+          >
             <p>
-              💡 <strong>Info Akun Demo:</strong>
+              Password Demo: <strong>123</strong>
             </p>
-            <ul>
-              <li>
-                Admin: <span className={styles.code}>admin</span>
-              </li>
-              <li>
-                Supervisor: <span className={styles.code}>spv</span>
-              </li>
-              <li>
-                Staff: <span className={styles.code}>staff</span>
-              </li>
-              <li>
-                Password: <span className={styles.code}>bebas</span>
-              </li>
-            </ul>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

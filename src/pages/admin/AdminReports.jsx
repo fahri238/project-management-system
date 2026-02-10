@@ -1,97 +1,58 @@
-import React, { useState } from "react";
-import {
-  FileText,
-  Eye,
-  Printer,
-  X,
-  Calendar,
-  Download,
-  Clock,
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { FileText, Eye, Printer, X, Calendar, Download, Clock } from "lucide-react";
 import styles from "../Reports.module.css";
 
+// IMPORT CONTROLLERS
+import { ReportController } from "../../controllers/ReportController";
+import { ProjectController } from "../../controllers/ProjectController";
+
 const AdminReports = () => {
-  // State
+  // --- STATE ---
   const [reportType, setReportType] = useState("rekap");
   const [project, setProject] = useState("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  
   const [showModal, setShowModal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false); // Loading state
 
-  // Data Dummy Proyek
-  const projects = [
-    { id: 1, title: "Sistem Deteksi Banjir IoT" },
-    { id: 2, title: "AI Chatbot Layanan Publik" },
-    { id: 3, title: "Computer Vision Absensi" },
-  ];
+  // State Data Dinamis
+  const [projectsList, setProjectsList] = useState([]);
+  const [historyList, setHistoryList] = useState([]);
+  const [previewData, setPreviewData] = useState({ headers: [], rows: [] });
 
-  // Data Dummy History (Agar Panel Kanan Tidak Kosong)
-  const history = [
-    {
-      id: 101,
-      title: "Laporan Rekapitulasi - Januari",
-      date: "01 Feb 2026, 09:00",
-      size: "1.2 MB",
-      type: "PDF",
-    },
-    {
-      id: 102,
-      title: "Hasil Monev - Sistem Banjir",
-      date: "30 Jan 2026, 14:30",
-      size: "850 KB",
-      type: "PDF",
-    },
-    {
-      id: 103,
-      title: "Distribusi Tim Q1 2026",
-      date: "15 Jan 2026, 10:15",
-      size: "2.4 MB",
-      type: "PDF",
-    },
-    {
-      id: 104,
-      title: "Laporan Akhir Tahun 2025",
-      date: "31 Dec 2025, 16:45",
-      size: "5.0 MB",
-      type: "ZIP",
-    },
-  ];
+  // --- 1. LOAD DATA AWAL (Projects & History) ---
+  useEffect(() => {
+    const initData = async () => {
+      // Load Projects untuk Dropdown
+      const pData = await ProjectController.getAllProjects();
+      setProjectsList(pData);
 
-  // Logic Content Table Preview
+      // Load History Admin
+      const hData = await ReportController.getReportHistory("admin");
+      setHistoryList(hData);
+    };
+    initData();
+  }, []);
+
+  // --- 2. GENERATE REPORT HANDLER ---
+  const handleGenerate = async () => {
+    setIsGenerating(true);
+    try {
+      const data = await ReportController.generateReportPreview(reportType, project);
+      setPreviewData(data);
+      setShowModal(true);
+    } catch (error) {
+      alert("Gagal membuat laporan.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const getReportTitle = () => {
     if (reportType === "rekap") return "Laporan Rekapitulasi Proyek";
     if (reportType === "monev") return "Laporan Monitoring & Evaluasi";
     if (reportType === "distribusi") return "Laporan Distribusi Tim";
-  };
-
-  const getTableHeaders = () => {
-    if (reportType === "rekap")
-      return ["No", "Nama Proyek", "Supervisor", "Status", "Progress"];
-    if (reportType === "monev")
-      return ["No", "Proyek", "Tanggal Evaluasi", "Komentar Admin", "Status"];
-    if (reportType === "distribusi")
-      return ["No", "Proyek", "Supervisor", "Jumlah Staff", "Divisi"];
-    return [];
-  };
-
-  const getDummyRow = (index) => {
-    if (reportType === "rekap")
-      return [
-        `Proyek ${index}`,
-        "Haldi Budiman",
-        index % 2 === 0 ? "Aktif" : "Selesai",
-        `${60 + index * 5}%`,
-      ];
-    if (reportType === "monev")
-      return [
-        `Proyek ${index}`,
-        `2026-02-0${index}`,
-        "Perlu percepatan testing...",
-        "Pending",
-      ];
-    if (reportType === "distribusi")
-      return [`Proyek ${index}`, "Fahri Ilmi", "4 Orang", "Frontend, IoT"];
-    return [];
   };
 
   return (
@@ -104,7 +65,7 @@ const AdminReports = () => {
         </p>
       </div>
 
-      {/* WORKSPACE (SPLIT VIEW) */}
+      {/* WORKSPACE */}
       <div className={styles.workspace}>
         {/* PANEL KIRI: GENERATOR */}
         <div className={styles.generatorPanel}>
@@ -133,7 +94,7 @@ const AdminReports = () => {
               onChange={(e) => setProject(e.target.value)}
             >
               <option value="all">Semua Proyek</option>
-              {projects.map((p) => (
+              {projectsList.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.title}
                 </option>
@@ -162,28 +123,27 @@ const AdminReports = () => {
 
           <button
             className={styles.btnPrimary}
-            onClick={() => setShowModal(true)}
+            onClick={handleGenerate}
+            disabled={isGenerating}
+            style={{ opacity: isGenerating ? 0.7 : 1 }}
           >
-            <Eye size={18} /> Generate Preview
+            <Eye size={18} /> {isGenerating ? "Generating..." : "Generate Preview"}
           </button>
         </div>
 
-        {/* PANEL KANAN: HISTORY / ARCHIVE (Pengisi Ruang Kosong) */}
+        {/* PANEL KANAN: HISTORY (Dari Controller) */}
         <div className={styles.archivePanel}>
           <div className={styles.archiveHeader}>
-            <div
-              className={styles.panelTitle}
-              style={{ border: 0, padding: 0 }}
-            >
+            <div className={styles.panelTitle} style={{ border: 0, padding: 0 }}>
               <Clock size={18} /> Riwayat Cetak Terakhir
             </div>
             <span style={{ fontSize: "0.8rem", color: "#64748b" }}>
-              4 Dokumen
+              {historyList.length} Dokumen
             </span>
           </div>
 
           <ul className={styles.archiveList}>
-            {history.map((item) => (
+            {historyList.map((item) => (
               <li key={item.id} className={styles.archiveItem}>
                 <div className={styles.fileIcon}>
                   <FileText size={20} />
@@ -205,130 +165,62 @@ const AdminReports = () => {
 
       {/* --- MODAL PREVIEW OVERLAY --- */}
       {showModal && (
-        <div
-          className={styles.modalOverlay}
-          onClick={() => setShowModal(false)}
-        >
-          <div
-            className={styles.modalContent}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Toolbar */}
+        <div className={styles.modalOverlay} onClick={() => setShowModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <div className={styles.previewTitle}>
                 <FileText size={20} /> Preview Dokumen
               </div>
               <div className={styles.modalActions}>
-                <button
-                  className={`${styles.modalBtn} ${styles.btnClose}`}
-                  onClick={() => setShowModal(false)}
-                >
+                <button className={`${styles.modalBtn} ${styles.btnClose}`} onClick={() => setShowModal(false)}>
                   <X size={18} /> Tutup
                 </button>
-                <button
-                  className={`${styles.modalBtn} ${styles.btnPrint}`}
-                  onClick={() => alert("Printing...")}
-                >
+                <button className={`${styles.modalBtn} ${styles.btnPrint}`} onClick={() => alert("Printing...")}>
                   <Printer size={18} /> Cetak PDF
                 </button>
               </div>
             </div>
 
-            {/* Kertas A4 Scrollable */}
             <div className={styles.previewBody}>
               <div className={styles.pdfPaper}>
                 {/* KOP */}
-                <div
-                  style={{
-                    borderBottom: "2px solid #1e293b",
-                    paddingBottom: "15px",
-                    marginBottom: "25px",
-                  }}
-                >
-                  <h3
-                    style={{
-                      margin: 0,
-                      color: "#1e293b",
-                      textTransform: "uppercase",
-                    }}
-                  >
+                <div style={{ borderBottom: "2px solid #1e293b", paddingBottom: "15px", marginBottom: "25px" }}>
+                  <h3 style={{ margin: 0, color: "#1e293b", textTransform: "uppercase" }}>
                     SAGARA AI SYSTEM
                   </h3>
-                  <p
-                    style={{
-                      margin: "4px 0 0",
-                      fontSize: "0.8rem",
-                      color: "#64748b",
-                    }}
-                  >
+                  <p style={{ margin: "4px 0 0", fontSize: "0.8rem", color: "#64748b" }}>
                     Dokumen Resmi Manajemen Proyek
                   </p>
                 </div>
 
                 {/* CONTENT */}
-                <h2
-                  style={{
-                    textDecoration: "underline",
-                    marginBottom: "10px",
-                    fontSize: "1.4rem",
-                  }}
-                >
+                <h2 style={{ textDecoration: "underline", marginBottom: "10px", fontSize: "1.4rem" }}>
                   {getReportTitle()}
                 </h2>
                 <p style={{ fontSize: "0.9rem", marginBottom: "30px" }}>
-                  Periode: {startDate || "-"} s/d {endDate || "-"} | Filter:{" "}
-                  {project === "all" ? "Semua Data" : "Data Terpilih"}
+                  Periode: {startDate || "-"} s/d {endDate || "-"} | Filter: {project === "all" ? "Semua Data" : "Data Terpilih"}
                 </p>
 
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    fontSize: "0.85rem",
-                  }}
-                >
+                {/* TABLE DARI PREVIEW DATA (Controller) */}
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
                   <thead>
-                    <tr
-                      style={{
-                        background: "#f1f5f9",
-                        borderBottom: "2px solid #cbd5e1",
-                      }}
-                    >
-                      {getTableHeaders().map((h, i) => (
-                        <th
-                          key={i}
-                          style={{
-                            padding: "10px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "left",
-                          }}
-                        >
+                    <tr style={{ background: "#f1f5f9", borderBottom: "2px solid #cbd5e1" }}>
+                      {previewData.headers.map((h, i) => (
+                        <th key={i} style={{ padding: "10px", border: "1px solid #e2e8f0", textAlign: "left" }}>
                           {h}
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {[1, 2, 3, 4, 5].map((item) => (
-                      <tr key={item}>
-                        <td
-                          style={{
-                            padding: "10px",
-                            border: "1px solid #e2e8f0",
-                            textAlign: "center",
-                          }}
-                        >
-                          {item}
+                    {previewData.rows.map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        <td style={{ padding: "10px", border: "1px solid #e2e8f0", textAlign: "center" }}>
+                          {rowIndex + 1}
                         </td>
-                        {getDummyRow(item).map((val, idx) => (
-                          <td
-                            key={idx}
-                            style={{
-                              padding: "10px",
-                              border: "1px solid #e2e8f0",
-                            }}
-                          >
-                            {val}
+                        {row.map((cell, cellIndex) => (
+                          <td key={cellIndex} style={{ padding: "10px", border: "1px solid #e2e8f0" }}>
+                            {cell}
                           </td>
                         ))}
                       </tr>
@@ -337,26 +229,10 @@ const AdminReports = () => {
                 </table>
 
                 {/* SIGNATURE */}
-                <div
-                  style={{
-                    marginTop: "auto",
-                    paddingTop: "50px",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                  }}
-                >
+                <div style={{ marginTop: "auto", paddingTop: "50px", display: "flex", justifyContent: "flex-end" }}>
                   <div style={{ textAlign: "center" }}>
-                    <p style={{ marginBottom: "60px", fontSize: "0.9rem" }}>
-                      Mengetahui, Administrator
-                    </p>
-                    <p
-                      style={{
-                        fontWeight: "bold",
-                        textDecoration: "underline",
-                      }}
-                    >
-                      System Admin
-                    </p>
+                    <p style={{ marginBottom: "60px", fontSize: "0.9rem" }}>Mengetahui, Administrator</p>
+                    <p style={{ fontWeight: "bold", textDecoration: "underline" }}>System Admin</p>
                   </div>
                 </div>
               </div>

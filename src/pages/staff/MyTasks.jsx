@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Search,
   Calendar,
@@ -12,80 +12,57 @@ import {
 } from "lucide-react";
 import styles from "./MyTasks.module.css";
 
+// --- IMPORT CONTROLLER ---
+import { TaskController } from "../../controllers/TaskController";
+import { ExperimentController } from "../../controllers/ExperimentController";
+
 const MyTasks = () => {
-  // --- 1. DATA TUGAS DUMMY ---
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Slicing Halaman Dashboard",
-      projectName: "Sistem Deteksi Banjir",
-      projectStatus: "Aktif",
-      supervisor: "Haldi Budiman",
-      deadline: "20 Feb 2026",
-      status: "In Progress",
-      priority: "High",
-      todoList: [
-        "Gunakan grid layout 3 kolom untuk statistik.",
-        "Pastikan card responsif di layar mobile (max-width: 768px).",
-        "Warna grafik harus sesuai panduan style guide (Indigo & Slate).",
-      ],
-    },
-    {
-      id: 2,
-      title: "Integrasi API Login",
-      projectName: "AI Chatbot Layanan",
-      projectStatus: "Pending",
-      supervisor: "Fahri Ilmi",
-      deadline: "22 Feb 2026",
-      status: "Revisi", // Status REVISI
-      priority: "Medium",
-      todoList: [
-        "Endpoint API: /api/v1/auth/login",
-        "Tambahkan validasi email format regex.",
-        "Simpan token di localStorage, jangan di cookie.",
-      ],
-      // Catatan Revisi
-      revisionNote:
-        "Validasi email masih lolos meskipun formatnya salah (tanpa @). Tolong perbaiki regex-nya dan tes ulang.",
-    },
-    {
-      id: 3,
-      title: "Fix Bug Responsif Mobile",
-      projectName: "Sistem Deteksi Banjir",
-      projectStatus: "Aktif",
-      supervisor: "Haldi Budiman",
-      deadline: "19 Feb 2026",
-      status: "To Do",
-      priority: "Low",
-      todoList: [
-        "Menu hamburger tidak bisa diklik di iOS Safari.",
-        "Padding header terlalu besar di layar < 400px.",
-      ],
-    },
-  ]);
+  // --- STATE ---
+  const [tasks, setTasks] = useState([]); // Awalnya kosong
+  const [loading, setLoading] = useState(true); // State Loading
+
+  // State Filter & Search
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("Semua");
 
   // State Modal & Form
   const [selectedTask, setSelectedTask] = useState(null);
   const [journal, setJournal] = useState("");
   const [file, setFile] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // State Loading Submit
+
+  // --- 1. FETCH DATA DARI CONTROLLER ---
+  useEffect(() => {
+    const loadTasks = async () => {
+      try {
+        // Simulasi: Ambil data untuk user yang sedang login "Fahri Ilmi"
+        const data = await TaskController.getTasksByStaff("Fahri Ilmi");
+        setTasks(data);
+      } catch (err) {
+        console.error("Gagal memuat tugas", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTasks();
+  }, []);
 
   // --- LOGIC FILTER ---
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("Semua");
-
   const filteredTasks = tasks.filter((task) => {
     const matchSearch = task.title
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
+    // Mapping status agar sesuai filter (Pending di DB = To Do di Filter UI)
+    const normalizedStatus = task.status === "Pending" ? "To Do" : task.status;
     const matchStatus =
-      filterStatus === "Semua" ? true : task.status === filterStatus;
+      filterStatus === "Semua" ? true : normalizedStatus === filterStatus;
+
     return matchSearch && matchStatus;
   });
 
   // --- HANDLERS ---
   const handleOpenModal = (task) => {
-    // Jika status "Menunggu Validasi", staff tidak bisa edit lagi
     if (task.status === "Menunggu Validasi") {
       alert("Tugas ini sedang diperiksa Supervisor. Harap tunggu validasi.");
       return;
@@ -109,7 +86,8 @@ const MyTasks = () => {
     }
   };
 
-  const handleSubmit = () => {
+  // --- 2. SUBMIT DENGAN EXPERIMENT CONTROLLER ---
+  const handleSubmit = async () => {
     if (!journal.trim()) {
       setErrorMsg("Jurnal kegiatan wajib diisi.");
       return;
@@ -119,14 +97,33 @@ const MyTasks = () => {
       return;
     }
 
-    // Update Status menjadi 'Menunggu Validasi'
-    const updatedTasks = tasks.map((t) =>
-      t.id === selectedTask.id ? { ...t, status: "Menunggu Validasi" } : t,
-    );
+    setIsSubmitting(true);
 
-    setTasks(updatedTasks);
-    alert(`Laporan Berhasil Disimpan! Status tugas kini 'Menunggu Validasi'.`);
-    setSelectedTask(null);
+    try {
+      // Panggil Controller Upload
+      const payload = {
+        taskId: selectedTask.id,
+        notes: journal,
+        file: file, // Di real backend ini dikirim sebagai FormData
+      };
+
+      const result = await ExperimentController.uploadExperiment(payload);
+
+      if (result.success) {
+        // Update Status Lokal UI agar langsung berubah
+        const updatedTasks = tasks.map((t) =>
+          t.id === selectedTask.id ? { ...t, status: "Menunggu Validasi" } : t,
+        );
+        setTasks(updatedTasks);
+
+        alert(result.message);
+        setSelectedTask(null); // Tutup Modal
+      }
+    } catch (error) {
+      setErrorMsg("Gagal mengirim laporan. Coba lagi.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Helper Warna
@@ -180,67 +177,87 @@ const MyTasks = () => {
           onChange={(e) => setFilterStatus(e.target.value)}
         >
           <option value="Semua">Semua Status</option>
-          <option value="To Do">To Do</option>
+          <option value="Pending">To Do</option>
           <option value="In Progress">In Progress</option>
           <option value="Revisi">Perlu Revisi</option>
         </select>
       </div>
 
-      {/* GRID TUGAS */}
-      <div className={styles.taskGrid}>
-        {filteredTasks.map((task) => (
-          <div
-            key={task.id}
-            className={styles.taskCard}
-            onClick={() => handleOpenModal(task)}
-          >
-            {/* Project Context */}
-            <div className={styles.cardProjectCtx}>
-              <span className={styles.projectName}>
-                <span
-                  className={styles.projectStatusDot}
-                  style={{
-                    background: getProjectStatusColor(task.projectStatus),
-                  }}
-                ></span>
-                {task.projectName}
-              </span>
-              <span
-                style={{
-                  fontSize: "0.7rem",
-                  fontWeight: "700",
-                  color: "#64748b",
-                  border: "1px solid #cbd5e1",
-                  padding: "2px 6px",
-                  borderRadius: "4px",
-                }}
+      {/* LOADING STATE */}
+      {loading ? (
+        <div style={{ padding: "40px", textAlign: "center", color: "#64748b" }}>
+          Memuat tugas Anda...
+        </div>
+      ) : (
+        /* GRID TUGAS */
+        <div className={styles.taskGrid}>
+          {filteredTasks.length > 0 ? (
+            filteredTasks.map((task) => (
+              <div
+                key={task.id}
+                className={styles.taskCard}
+                onClick={() => handleOpenModal(task)}
               >
-                {task.priority}
-              </span>
-            </div>
+                {/* Project Context */}
+                <div className={styles.cardProjectCtx}>
+                  <span className={styles.projectName}>
+                    <span
+                      className={styles.projectStatusDot}
+                      style={{
+                        background: getProjectStatusColor(task.projectStatus),
+                      }}
+                    ></span>
+                    {task.projectName}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: "700",
+                      color: "#64748b",
+                      border: "1px solid #cbd5e1",
+                      padding: "2px 6px",
+                      borderRadius: "4px",
+                    }}
+                  >
+                    {task.priority}
+                  </span>
+                </div>
 
-            {/* Body */}
-            <div className={styles.cardBody}>
-              <h3 className={styles.taskTitle}>{task.title}</h3>
-              <div className={styles.supervisorInfo}>
-                <User size={14} /> Sv: {task.supervisor}
-              </div>
-            </div>
+                {/* Body */}
+                <div className={styles.cardBody}>
+                  <h3 className={styles.taskTitle}>{task.title}</h3>
+                  <div className={styles.supervisorInfo}>
+                    <User size={14} /> Sv: {task.supervisor}
+                  </div>
+                </div>
 
-            {/* Footer */}
-            <div className={styles.cardFooter}>
-              <div className={styles.deadline}>
-                <Calendar size={14} /> {task.deadline}
+                {/* Footer */}
+                <div className={styles.cardFooter}>
+                  <div className={styles.deadline}>
+                    <Calendar size={14} /> {task.deadline}
+                  </div>
+                  <span
+                    className={`${styles.badge} ${getTaskStatusClass(task.status)}`}
+                  >
+                    {task.status === "Pending" ? "To Do" : task.status}
+                  </span>
+                </div>
               </div>
-              <span
-                className={`${styles.badge} ${getTaskStatusClass(task.status)}`}
-              >
-                {task.status}
-              </span>
+            ))
+          ) : (
+            <div
+              style={{
+                gridColumn: "1 / -1",
+                textAlign: "center",
+                padding: "40px",
+                color: "#94a3b8",
+              }}
+            >
+              Tidak ada tugas ditemukan.
             </div>
-          </div>
-        ))}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* --- MODAL DETAIL & UPLOAD --- */}
       {selectedTask && (
@@ -274,23 +291,35 @@ const MyTasks = () => {
 
             {/* Body Form */}
             <div className={styles.modalBody}>
-              {/* SECTION 1: INSTRUKSI SUPERVISOR (TO DO LIST) */}
+              {/* SECTION 1: INSTRUKSI SUPERVISOR */}
               <div className={styles.instructionBox}>
                 <div className={styles.instructionTitle}>
                   <ListChecks size={18} /> Instruksi / To-Do List dari
                   Supervisor
                 </div>
-                <ul className={styles.todoList}>
-                  {selectedTask.todoList.map((item, index) => (
-                    <li key={index} className={styles.todoItem}>
-                      <ChevronRight size={16} className={styles.todoIcon} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                {selectedTask.todoList && selectedTask.todoList.length > 0 ? (
+                  <ul className={styles.todoList}>
+                    {selectedTask.todoList.map((item, index) => (
+                      <li key={index} className={styles.todoItem}>
+                        <ChevronRight size={16} className={styles.todoIcon} />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p
+                    style={{
+                      fontSize: "0.9rem",
+                      color: "#64748b",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    Tidak ada instruksi khusus.
+                  </p>
+                )}
               </div>
 
-              {/* --- UPDATE: SECTION ALERT REVISI (Menggunakan Class CSS) --- */}
+              {/* ALERT REVISI */}
               {selectedTask.status === "Revisi" && (
                 <div className={styles.revisionBox}>
                   <AlertCircle
@@ -307,13 +336,11 @@ const MyTasks = () => {
                 </div>
               )}
 
-              {/* Garis Pemisah */}
               <div className={styles.divider}></div>
 
               {/* SECTION 2: FORM PELAPORAN */}
               <h4 className={styles.sectionLabel}>Form Laporan Kerja</h4>
 
-              {/* Error Message (Inline style ok untuk alert kecil, atau buat class errorMsg) */}
               {errorMsg && (
                 <div
                   style={{
@@ -332,24 +359,30 @@ const MyTasks = () => {
                 </div>
               )}
 
-              {/* Input Jurnal */}
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Jurnal Kegiatan</label>
                 <textarea
                   className={styles.textArea}
                   rows="4"
-                  placeholder="Deskripsikan perbaikan atau pekerjaan yang Anda lakukan hari ini..."
+                  placeholder="Deskripsikan perbaikan atau pekerjaan yang Anda lakukan..."
                   value={journal}
                   onChange={(e) => setJournal(e.target.value)}
+                  disabled={isSubmitting}
                 ></textarea>
               </div>
 
-              {/* Input File */}
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>Bukti Eksperimen</label>
                 <div
                   className={styles.fileUploadBox}
-                  onClick={() => document.getElementById("fileInput").click()}
+                  onClick={() =>
+                    !isSubmitting &&
+                    document.getElementById("fileInput").click()
+                  }
+                  style={{
+                    cursor: isSubmitting ? "not-allowed" : "pointer",
+                    opacity: isSubmitting ? 0.7 : 1,
+                  }}
                 >
                   <input
                     type="file"
@@ -357,6 +390,7 @@ const MyTasks = () => {
                     hidden
                     onChange={handleFileChange}
                     accept=".pdf,.zip,.png,.jpg,.jpeg"
+                    disabled={isSubmitting}
                   />
                   <UploadCloud
                     size={32}
@@ -385,13 +419,18 @@ const MyTasks = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 className={styles.submitBtn}
                 onClick={handleSubmit}
-                disabled={!journal || !file}
+                disabled={!journal || !file || isSubmitting}
               >
-                <CheckCircle2 size={18} /> Kirim Laporan
+                {isSubmitting ? (
+                  "Mengirim Laporan..."
+                ) : (
+                  <>
+                    <CheckCircle2 size={18} /> Kirim Laporan
+                  </>
+                )}
               </button>
             </div>
           </div>

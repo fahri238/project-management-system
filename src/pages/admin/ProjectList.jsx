@@ -1,36 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // 1. TAMBAHKAN IMPORT INI
 import styles from "./ProjectList.module.css";
 
-const ProjectList = () => {
-  // 1. Data Dummy Proyek
-  const [projects, setProjects] = useState([
-    {
-      id: 1,
-      name: "Sistem Informasi HRD",
-      category: "Web App",
-      supervisor: "Budi Santoso",
-      deadline: "2026-03-20",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Aplikasi E-Commerce Batik",
-      category: "Mobile App",
-      supervisor: "Diana Putri",
-      deadline: "2026-02-15",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      name: "Deteksi Banjir",
-      category: "Mobile App",
-      supervisor: "Diana Putri",
-      deadline: "2026-02-15",
-      status: "Completed",
-    },
-  ]);
+// IMPORT CONTROLLER
+import { ProjectController } from "../../controllers/ProjectController";
 
-  // 2. Data Dummy STAFF (Yang akan muncul di Checkbox)
+const ProjectList = () => {
+  // 2. INITIALIZE NAVIGATE
+  const navigate = useNavigate();
+
+  // 1. STATE
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // ... (Bagian Fetch Data, State Form, Filter, dll biarkan SAMA PERSIS) ...
+  // ... (Agar kode tidak kepanjangan, saya skip bagian tengah yang tidak berubah) ...
+
+  const fetchProjects = async () => {
+    try {
+      const data = await ProjectController.getAllProjects();
+      const mappedData = data.map((p) => ({
+        ...p,
+        name: p.title,
+      }));
+      setProjects(mappedData);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
   const availableStaff = [
     { id: 101, name: "Siti Aminah" },
     { id: 102, name: "Andi Pratama" },
@@ -43,90 +47,134 @@ const ProjectList = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentProjectId, setCurrentProjectId] = useState(null);
 
-  // 3. State Form Baru (Ada Category & TeamMembers Array)
-  const [newProject, setNewProject] = useState({
+  const initialFormState = {
     name: "",
-    category: "", // Dropdown Kategori
+    category: "",
     description: "",
     supervisor: "",
     deadline: "",
     status: "Active",
-    teamMembers: [], // Array untuk menampung staff yang dicentang
-  });
+    teamMembers: [],
+  };
 
-  // Filter Logic
+  const [formData, setFormData] = useState(initialFormState);
+
+  // HANDLERS
+  const handleOpenAdd = () => {
+    setIsEditMode(false);
+    setFormData(initialFormState);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEdit = (project) => {
+    setIsEditMode(true);
+    setCurrentProjectId(project.id);
+    setFormData({
+      name: project.name,
+      category: project.category,
+      description: project.description || "",
+      supervisor: project.supervisor,
+      deadline: project.deadline || "",
+      status:
+        project.status === "Aktif"
+          ? "Active"
+          : project.status === "Pending"
+            ? "Pending"
+            : "Active",
+      teamMembers: project.team || [],
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (id, name) => {
+    if (window.confirm(`Yakin ingin menghapus proyek "${name}"?`)) {
+      try {
+        const result = await ProjectController.deleteProject(id);
+        if (result.success) {
+          alert(result.message);
+          fetchProjects();
+        }
+      } catch (error) {
+        alert("Gagal menghapus data.");
+      }
+    }
+  };
+
   const filteredProjects = projects.filter((project) => {
+    const statusMap = { Active: "Aktif", Completed: "Selesai" };
+    const currentStatus = statusMap[project.status] || project.status;
+    const filterKey = statusMap[filterStatus] || filterStatus;
+
     const matchStatus =
-      filterStatus === "all" ? true : project.status === filterStatus;
+      filterStatus === "all"
+        ? true
+        : project.status === filterKey || project.status === filterStatus;
     const matchSearch =
-      project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (project.name || project.title)
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       project.supervisor.toLowerCase().includes(searchTerm.toLowerCase());
     return matchStatus && matchSearch;
   });
 
-  // Handle Input Biasa (Text & Select)
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProject({ ...newProject, [name]: value });
+    setFormData({ ...formData, [name]: value });
   };
 
-  // 4. Handle Checkbox Change (Logic Staff)
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
-    const { teamMembers } = newProject;
-
+    const { teamMembers } = formData;
     if (checked) {
-      // Jika dicentang, tambahkan nama ke array
-      setNewProject({ ...newProject, teamMembers: [...teamMembers, value] });
+      setFormData({ ...formData, teamMembers: [...teamMembers, value] });
     } else {
-      // Jika hapus centang, buang nama dari array
-      setNewProject({
-        ...newProject,
+      setFormData({
+        ...formData,
         teamMembers: teamMembers.filter((name) => name !== value),
       });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Data Project Baru:", newProject); // Cek console untuk lihat hasilnya
+    setIsSubmitting(true);
+    try {
+      let result;
+      if (isEditMode) {
+        result = await ProjectController.updateProject(
+          currentProjectId,
+          formData,
+        );
+      } else {
+        result = await ProjectController.createProject(formData);
+      }
 
-    const newId = projects.length + 1;
-    setProjects([...projects, { id: newId, ...newProject }]);
-
-    setIsModalOpen(false);
-    // Reset Form
-    setNewProject({
-      name: "",
-      category: "",
-      description: "",
-      supervisor: "",
-      deadline: "",
-      status: "Active",
-      teamMembers: [],
-    });
-    alert(
-      `Proyek "${newProject.name}" berhasil dibuat dengan ${newProject.teamMembers.length} anggota tim!`,
-    );
+      if (result.success) {
+        alert(result.message);
+        fetchProjects();
+        setIsModalOpen(false);
+      }
+    } catch (error) {
+      alert("Terjadi kesalahan.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getStatusStyle = (status) => {
-    switch (status) {
-      case "Active":
-        return styles.statusActive;
-      case "Pending":
-        return styles.statusPending;
-      case "Completed":
-        return styles.statusCompleted;
-      default:
-        return "";
-    }
+    if (status === "Aktif" || status === "Active") return styles.statusActive;
+    if (status === "Pending") return styles.statusPending;
+    if (status === "Selesai" || status === "Completed")
+      return styles.statusCompleted;
+    return "";
   };
 
   return (
     <div className={styles.container}>
-      {/* HEADER & CONTROLS SAMA SEPERTI SEBELUMNYA */}
       <div className={styles.header}>
         <div>
           <h2 className={styles.title}>Daftar Proyek</h2>
@@ -134,10 +182,7 @@ const ProjectList = () => {
             Kelola dan pantau seluruh proyek yang berjalan
           </p>
         </div>
-        <button
-          className={styles.addButton}
-          onClick={() => setIsModalOpen(true)}
-        >
+        <button className={styles.addButton} onClick={handleOpenAdd}>
           + Tambah Proyek
         </button>
       </div>
@@ -156,68 +201,99 @@ const ProjectList = () => {
             className={`${styles.filterButton} ${filterStatus === status ? styles.active : ""}`}
             onClick={() => setFilterStatus(status)}
           >
-            {status === "all" ? "Semua Proyek" : status}
+            {status === "all" ? "Semua" : status}
           </button>
         ))}
       </div>
 
-      {/* TABLE */}
       <div className={styles.tableContainer}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th width="5%">No</th>
-              <th width="25%">Nama Proyek</th>
-              <th width="15%">Kategori</th> {/* Kolom Baru */}
-              <th width="20%">Supervisor</th>
-              <th width="15%">Deadline</th>
-              <th width="10%">Status</th>
-              <th width="10%" style={{ textAlign: "center" }}>
-                Aksi
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProjects.map((project, index) => (
-              <tr key={project.id}>
-                <td>{index + 1}</td>
-                <td>
-                  <div style={{ fontWeight: 600, color: "#1e293b" }}>
-                    {project.name}
-                  </div>
-                </td>
-                <td>
-                  <span style={{ fontSize: "0.85rem", color: "#64748b" }}>
-                    {project.category || "-"}
-                  </span>
-                </td>
-                <td>{project.supervisor}</td>
-                <td style={{ color: "#64748b" }}>{project.deadline}</td>
-                <td>
-                  <span
-                    className={`${styles.statusBadge} ${getStatusStyle(project.status)}`}
-                  >
-                    {project.status}
-                  </span>
-                </td>
-                <td>
-                  <div className={styles.actionCell}>
-                    <button className={styles.detailBtn}>Detail</button>
-                    <button className={`${styles.iconBtn} ${styles.editBtn}`}>
-                      ✎
-                    </button>
-                    <button className={`${styles.iconBtn} ${styles.deleteBtn}`}>
-                      🗑
-                    </button>
-                  </div>
-                </td>
+        {loading ? (
+          <div
+            style={{ padding: "20px", textAlign: "center", color: "#64748b" }}
+          >
+            Memuat data...
+          </div>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th width="5%">No</th>
+                <th width="25%">Nama Proyek</th>
+                <th width="15%">Kategori</th>
+                <th width="20%">Supervisor</th>
+                <th width="15%">Deadline</th>
+                <th width="10%">Status</th>
+                <th width="10%" style={{ textAlign: "center" }}>
+                  Aksi
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredProjects.map((project, index) => (
+                <tr key={project.id}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <div style={{ fontWeight: 600, color: "#1e293b" }}>
+                      {project.name}
+                    </div>
+                  </td>
+                  <td>
+                    <span style={{ fontSize: "0.85rem", color: "#64748b" }}>
+                      {project.category || "-"}
+                    </span>
+                  </td>
+                  <td>{project.supervisor}</td>
+                  <td style={{ color: "#64748b" }}>
+                    {project.deadline
+                      ? new Date(project.deadline).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "-"}
+                  </td>
+                  <td>
+                    <span
+                      className={`${styles.statusBadge} ${getStatusStyle(project.status)}`}
+                    >
+                      {project.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className={styles.actionCell}>
+                      {/* 3. TOMBOL DETAIL SEKARANG NAVIGASI KE MONITORING */}
+                      <button
+                        className={styles.detailBtn}
+                        onClick={() =>
+                          navigate("/admin/monitoring", {
+                            state: { projectId: project.id },
+                          })
+                        }
+                      >
+                        Detail
+                      </button>
+                      <button
+                        className={`${styles.iconBtn} ${styles.editBtn}`}
+                        onClick={() => handleOpenEdit(project)}
+                      >
+                        ✎
+                      </button>
+                      <button
+                        className={`${styles.iconBtn} ${styles.deleteBtn}`}
+                        onClick={() => handleDelete(project.id, project.name)}
+                      >
+                        🗑
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      {/* --- MODAL FORM --- */}
+      {/* MODAL FORM (Isi tetap sama) */}
       {isModalOpen && (
         <div
           className={styles.modalOverlay}
@@ -228,7 +304,9 @@ const ProjectList = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>Buat Proyek Baru</h3>
+              <h3 className={styles.modalTitle}>
+                {isEditMode ? "Edit Proyek" : "Buat Proyek Baru"}
+              </h3>
               <button
                 className={styles.closeButton}
                 onClick={() => setIsModalOpen(false)}
@@ -236,11 +314,9 @@ const ProjectList = () => {
                 ×
               </button>
             </div>
-
             <form onSubmit={handleSubmit}>
               <div className={styles.modalBody}>
                 <div className={styles.formGrid}>
-                  {/* Nama Proyek */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Nama Proyek</label>
                     <input
@@ -248,52 +324,42 @@ const ProjectList = () => {
                       name="name"
                       className={styles.formInput}
                       placeholder="Contoh: Sistem Deteksi Banjir"
-                      value={newProject.name}
+                      value={formData.name}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-
-                  {/* KATEGORI (Dropdown Baru) */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Kategori Proyek</label>
                     <select
                       name="category"
                       className={styles.formSelect}
-                      value={newProject.category}
+                      value={formData.category}
                       onChange={handleInputChange}
                       required
                     >
                       <option value="">-- Pilih Kategori --</option>
                       <option value="Web App">Web Application</option>
                       <option value="Mobile App">Mobile Application</option>
-                      <option value="IoT">Internet of Things (IoT)</option>
-                      <option value="AI/ML">
-                        Artificial Intelligence / ML
-                      </option>
-                      <option value="Riset">Penelitian / Riset</option>
+                      <option value="IoT">IoT</option>
+                      <option value="AI/ML">AI / Machine Learning</option>
                     </select>
                   </div>
-
-                  {/* Deskripsi (Full Width) */}
                   <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                     <label className={styles.formLabel}>Deskripsi Proyek</label>
                     <textarea
                       name="description"
                       className={styles.formTextarea}
-                      placeholder="Jelaskan tujuan dan detail proyek ini..."
-                      value={newProject.description}
+                      value={formData.description}
                       onChange={handleInputChange}
                     ></textarea>
                   </div>
-
-                  {/* Supervisor */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Supervisor</label>
                     <select
                       name="supervisor"
                       className={styles.formSelect}
-                      value={newProject.supervisor}
+                      value={formData.supervisor}
                       onChange={handleInputChange}
                       required
                     >
@@ -303,36 +369,19 @@ const ProjectList = () => {
                       <option value="Haldi Budiman">Haldi Budiman</option>
                     </select>
                   </div>
-
-                  {/* Deadline */}
                   <div className={styles.formGroup}>
-                    <label className={styles.formLabel}>Deadline Target</label>
+                    <label className={styles.formLabel}>Deadline</label>
                     <input
                       type="date"
                       name="deadline"
                       className={styles.formInput}
-                      value={newProject.deadline}
+                      value={formData.deadline}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
-
-                  {/* ANGGOTA TIM (CHECKBOX LIST) */}
                   <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                    <label className={styles.formLabel}>
-                      Anggota Tim (Staff)
-                      <span
-                        style={{
-                          fontWeight: "normal",
-                          color: "#64748b",
-                          marginLeft: "8px",
-                          fontSize: "0.8rem",
-                        }}
-                      >
-                        *Pilih staff yang terlibat
-                      </span>
-                    </label>
-
+                    <label className={styles.formLabel}>Anggota Tim</label>
                     <div className={styles.checkboxContainer}>
                       <div className={styles.checkboxGrid}>
                         {availableStaff.map((staff) => (
@@ -341,7 +390,7 @@ const ProjectList = () => {
                               type="checkbox"
                               className={styles.checkboxInput}
                               value={staff.name}
-                              checked={newProject.teamMembers.includes(
+                              checked={formData.teamMembers.includes(
                                 staff.name,
                               )}
                               onChange={handleCheckboxChange}
@@ -352,23 +401,20 @@ const ProjectList = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/* Status Awal */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Status Awal</label>
                     <select
                       name="status"
                       className={styles.formSelect}
-                      value={newProject.status}
+                      value={formData.status}
                       onChange={handleInputChange}
                     >
-                      <option value="Active">Active (Sedang Berjalan)</option>
-                      <option value="Pending">Pending (Persiapan)</option>
+                      <option value="Active">Active</option>
+                      <option value="Pending">Pending</option>
                     </select>
                   </div>
                 </div>
               </div>
-
               <div className={styles.modalFooter}>
                 <button
                   type="button"
@@ -377,8 +423,16 @@ const ProjectList = () => {
                 >
                   Batal
                 </button>
-                <button type="submit" className={styles.saveBtn}>
-                  Simpan Proyek
+                <button
+                  type="submit"
+                  className={styles.saveBtn}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting
+                    ? "Menyimpan..."
+                    : isEditMode
+                      ? "Simpan Perubahan"
+                      : "Simpan Proyek"}
                 </button>
               </div>
             </form>

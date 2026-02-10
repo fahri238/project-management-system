@@ -1,176 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Validation.module.css";
+import { CheckCircle2, XCircle, FileText, AlertCircle } from "lucide-react"; // Opsional: Icon
+
+// IMPORT CONTROLLER
+import { ExperimentController } from "../../controllers/ExperimentController";
 
 const Validation = () => {
-  // Data Dummy
-  const [reports, setReports] = useState([
-    {
-      id: 1,
-      staffName: "Siti Aminah",
-      taskTitle: "Cleaning Data Curah Hujan",
-      date: "07 Feb 2026",
-      description:
-        "Saya telah membersihkan data null dan duplikat menggunakan Pandas. File CSV hasil cleaning terlampir.",
-      file: "cleaning_result_v1.csv",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 2,
-      staffName: "Andi Pratama",
-      taskTitle: "Setup Sensor Ultrasonik",
-      date: "06 Feb 2026",
-      description:
-        "Sensor telah dipasang di pin D4 dan D5. Dokumentasi terlampir.",
-      file: "dokumentasi_sensor.pdf",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 3,
-      staffName: "Eko Wijaya",
-      taskTitle: "Integrasi API Authentication",
-      date: "06 Feb 2026",
-      description: "Endpoint login dan register sudah terhubung dengan JWT. Token berhasil disimpan di localStorage.",
-      file: "auth_integration_report.pdf",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 4,
-      staffName: "Rina Kartika",
-      taskTitle: "Desain Wireframe Dashboard",
-      date: "05 Feb 2026",
-      description: "Revisi desain dashboard admin sesuai feedback minggu lalu. Warna sudah disesuaikan dengan palet perusahaan.",
-      file: "wireframe_v2.fig",
-      status: "Revisi",
-    },
-    {
-      id: 5,
-      staffName: "Budi Santoso",
-      taskTitle: "Kalibrasi Sensor Suhu",
-      date: "05 Feb 2026",
-      description: "Melakukan kalibrasi ulang pada sensor DHT11 karena pembacaan sempat error. Sekarang deviasi sudah di bawah 1%.",
-      file: "kalibrasi_log.xlsx",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 6,
-      staffName: "Siti Aminah",
-      taskTitle: "Training Model Deteksi Wajah",
-      date: "04 Feb 2026",
-      description: "Model YOLOv8 telah dilatih selama 100 epoch. Akurasi mAP mencapai 85%. Grafik loss terlampir.",
-      file: "training_metrics.png",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 7,
-      staffName: "Reza Rahardian",
-      taskTitle: "Konfigurasi Docker Container",
-      date: "04 Feb 2026",
-      description: "Docker Compose untuk environment development sudah siap (Node.js + PostgreSQL + Redis).",
-      file: "docker-compose.yml",
-      status: "Valid",
-    },
-    {
-      id: 8,
-      staffName: "Maya Sari",
-      taskTitle: "Testing Skenario Checkout",
-      date: "04 Feb 2026",
-      description: "Menemukan bug saat user melakukan pembayaran dengan e-wallet. Laporan bug detail ada di dokumen.",
-      file: "bug_report_checkout.docx",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 9,
-      staffName: "Andi Pratama",
-      taskTitle: "Solder PCB NodeMCU",
-      date: "03 Feb 2026",
-      description: "Perakitan 5 unit device IoT untuk titik pantau A sampai E telah selesai disolder.",
-      file: "foto_perakitan.zip",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 10,
-      staffName: "Dedi Kurniawan",
-      taskTitle: "Slicing Halaman Landing Page",
-      date: "03 Feb 2026",
-      description: "Konversi desain Figma ke React.js selesai. Responsif untuk mobile dan desktop.",
-      file: "screenshot_landing.jpg",
-      status: "Valid",
-    },
-    {
-      id: 11,
-      staffName: "Eko Wijaya",
-      taskTitle: "Optimasi Query Database",
-      date: "02 Feb 2026",
-      description: "Menambahkan indexing pada tabel 'Transactions'. Waktu load data berkurang dari 2s menjadi 200ms.",
-      file: "query_analysis.sql",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 12,
-      staffName: "Rina Kartika",
-      taskTitle: "User Research Interview",
-      date: "02 Feb 2026",
-      description: "Hasil wawancara dengan 5 responden terkait fitur baru. Rangkuman insight user terlampir.",
-      file: "user_research_summary.pdf",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 13,
-      staffName: "Siti Aminah",
-      taskTitle: "Augmentasi Data Gambar",
-      date: "01 Feb 2026",
-      description: "Menambahkan variasi rotasi dan brightness pada dataset untuk mencegah overfitting.",
-      file: "dataset_sample.zip",
-      status: "Revisi",
-    },
-    {
-      id: 14,
-      staffName: "Reza Rahardian",
-      taskTitle: "Setup CI/CD Pipeline",
-      date: "01 Feb 2026",
-      description: "GitHub Actions sudah dikonfigurasi untuk auto-deploy ke server staging saat push ke branch main.",
-      file: "pipeline_config.yaml",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 15,
-      staffName: "Budi Santoso",
-      taskTitle: "Instalasi Gateway LoRa",
-      date: "31 Jan 2026",
-      description: "Gateway LoRaWAN telah dipasang di atap gedung B untuk cakupan area 2km.",
-      file: "dokumentasi_gateway.pdf",
-      status: "Valid",
-    },
-    {
-      id: 16,
-      staffName: "Maya Sari",
-      taskTitle: "UAT (User Acceptance Test)",
-      date: "30 Jan 2026",
-      description: "Dokumen UAT telah ditandatangani oleh klien. Semua fitur utama berjalan lancar.",
-      file: "uat_signed.pdf",
-      status: "Menunggu Validasi",
-    },
-    {
-      id: 17,
-      staffName: "Dedi Kurniawan",
-      taskTitle: "Fix Bug Navigasi Mobile",
-      date: "30 Jan 2026",
-      description: "Memperbaiki masalah hamburger menu yang tidak bisa diklik di iOS Safari.",
-      file: "patch_notes.txt",
-      status: "Menunggu Validasi",
-    },
-  ]);
+  // --- STATE ---
+  const [reports, setReports] = useState([]); // Data Laporan
+  const [loading, setLoading] = useState(true);
 
   // State Modal
   const [selectedReport, setSelectedReport] = useState(null);
 
-  // State Form Input
-  const [validationStatus, setValidationStatus] = useState("ACC"); // Default 'ACC' (Terima)
+  // State Form Validasi
+  const [validationStatus, setValidationStatus] = useState("ACC"); // Default 'ACC'
   const [feedback, setFeedback] = useState("");
+  const [isSaving, setIsSaving] = useState(false); // Loading saat simpan
 
+  // --- 1. FETCH DATA DARI CONTROLLER ---
+  useEffect(() => {
+    const loadReports = async () => {
+      try {
+        const data = await ExperimentController.getAllExperiments();
+        setReports(data);
+      } catch (err) {
+        console.error("Gagal memuat laporan", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadReports();
+  }, []);
+
+  // --- HANDLERS ---
   const handleReview = (report) => {
     setSelectedReport(report);
-    setValidationStatus("ACC"); // Reset default ke ACC saat buka baru
+    setValidationStatus("ACC"); // Reset ke ACC saat buka
     setFeedback("");
   };
 
@@ -178,30 +44,45 @@ const Validation = () => {
     setSelectedReport(null);
   };
 
-  // Logic Simpan (Single Button)
-  const handleSaveValidation = () => {
-    // Tentukan status akhir berdasarkan radio button yang dipilih
+  // --- 2. SIMPAN VALIDASI KE CONTROLLER ---
+  const handleSaveValidation = async () => {
+    setIsSaving(true);
+
+    // Tentukan status akhir
     const finalStatus = validationStatus === "ACC" ? "Valid" : "Revisi";
 
-    const updatedReports = reports.map((r) => {
-      if (r.id === selectedReport.id) {
-        return { ...r, status: finalStatus };
+    try {
+      // Panggil Controller
+      const result = await ExperimentController.validateExperiment(
+        selectedReport.id,
+        finalStatus,
+        feedback,
+      );
+
+      if (result.success) {
+        // Update UI Lokal (Optimistic Update)
+        const updatedReports = reports.map((r) => {
+          if (r.id === selectedReport.id) {
+            return { ...r, status: finalStatus };
+          }
+          return r;
+        });
+
+        setReports(updatedReports);
+        alert(result.message);
+        handleClose();
+      } else {
+        alert("Gagal menyimpan validasi.");
       }
-      return r;
-    });
-
-    setReports(updatedReports);
-
-    // Feedback Message
-    const msg =
-      finalStatus === "Valid"
-        ? `Validasi Disimpan: Laporan ${selectedReport.staffName} DITERIMA.`
-        : `Validasi Disimpan: Laporan dikembalikan untuk REVISI.`;
-
-    alert(msg);
-    handleClose();
+    } catch (error) {
+      console.error(error);
+      alert("Terjadi kesalahan sistem.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
+  // Helper Class Badge
   const getBadgeClass = (status) => {
     if (status === "Valid") return styles.badgeValid;
     if (status === "Revisi") return styles.badgeRevisi;
@@ -218,47 +99,69 @@ const Validation = () => {
       </div>
 
       <div className={styles.tableContainer}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Nama Staff</th>
-              <th>Judul Tugas</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reports.map((report, index) => (
-              <tr key={report.id}>
-                <td>{index + 1}</td>
-                <td>{report.staffName}</td>
-                <td>{report.taskTitle}</td>
-                <td>
-                  <span
-                    className={`${styles.badge} ${getBadgeClass(report.status)}`}
-                  >
-                    {report.status}
-                  </span>
-                </td>
-                <td>
-                  {report.status !== "Valid" && (
-                    <button
-                      className={styles.reviewBtn}
-                      onClick={() => handleReview(report)}
-                    >
-                      Review
-                    </button>
-                  )}
-                  {report.status === "Valid" && <span>✓ Selesai</span>}
-                </td>
+        {loading ? (
+          <div
+            style={{ padding: "40px", textAlign: "center", color: "#64748b" }}
+          >
+            Memuat daftar laporan...
+          </div>
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Staff</th>
+                <th>Judul Tugas</th>
+                <th>Tanggal</th>
+                <th>Status</th>
+                <th>Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {reports.map((report, index) => (
+                <tr key={report.id}>
+                  <td>{index + 1}</td>
+                  <td style={{ fontWeight: "600" }}>{report.staffName}</td>
+                  <td>{report.taskTitle}</td>
+                  <td>{report.date}</td>
+                  <td>
+                    <span
+                      className={`${styles.badge} ${getBadgeClass(report.status)}`}
+                    >
+                      {report.status}
+                    </span>
+                  </td>
+                  <td>
+                    {/* Tombol Review hanya muncul jika belum Valid */}
+                    {report.status !== "Valid" ? (
+                      <button
+                        className={styles.reviewBtn}
+                        onClick={() => handleReview(report)}
+                      >
+                        Review
+                      </button>
+                    ) : (
+                      <span
+                        style={{
+                          color: "#15803d",
+                          fontSize: "0.9rem",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                        }}
+                      >
+                        <CheckCircle2 size={16} /> Selesai
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      {/* --- MODAL SESUAI WIREFRAME --- */}
+      {/* --- MODAL VALIDASI --- */}
       {selectedReport && (
         <div className={styles.modalOverlay} onClick={handleClose}>
           <div
@@ -273,7 +176,7 @@ const Validation = () => {
             </div>
 
             <div className={styles.modalBody}>
-              {/* 1. KOTAK INFO LAPORAN (Report Box) */}
+              {/* 1. REPORT CONTEXT */}
               <div className={styles.reportContextBox}>
                 <label className={styles.reportLabel}>
                   Laporan dari:{" "}
@@ -284,21 +187,19 @@ const Validation = () => {
                 <p className={styles.reportContent}>
                   "{selectedReport.description}"
                 </p>
-
-                {/* Tombol Lampiran */}
                 <button
                   className={styles.attachmentBtn}
                   onClick={() => alert("Membuka file: " + selectedReport.file)}
                 >
-                  📎 Lihat Lampiran ({selectedReport.file})
+                  <FileText size={16} /> Lihat Lampiran ({selectedReport.file})
                 </button>
               </div>
 
-              {/* 2. RADIO BUTTON (Status Validasi) */}
+              {/* 2. PILIHAN STATUS VALIDASI */}
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Status Validasi</label>
+                <label className={styles.formLabel}>Keputusan Validasi</label>
                 <div className={styles.radioGroup}>
-                  {/* Opsi Terima (ACC) */}
+                  {/* TERIMA (ACC) */}
                   <label
                     className={`${styles.radioItem} ${validationStatus === "ACC" ? styles.radioItemSelected : ""}`}
                   >
@@ -312,9 +213,15 @@ const Validation = () => {
                     <span>Terima (ACC)</span>
                   </label>
 
-                  {/* Opsi Perlu Revisi */}
+                  {/* REVISI */}
                   <label
                     className={`${styles.radioItem} ${validationStatus === "Revisi" ? styles.radioItemSelected : ""}`}
+                    style={{
+                      borderColor:
+                        validationStatus === "Revisi" ? "#ef4444" : "",
+                      backgroundColor:
+                        validationStatus === "Revisi" ? "#fef2f2" : "",
+                    }}
                   >
                     <input
                       type="radio"
@@ -322,8 +229,15 @@ const Validation = () => {
                       className={styles.radioInput}
                       checked={validationStatus === "Revisi"}
                       onChange={() => setValidationStatus("Revisi")}
+                      style={{ accentColor: "#ef4444" }}
                     />
-                    <span>Perlu Revisi</span>
+                    <span
+                      style={{
+                        color: validationStatus === "Revisi" ? "#b91c1c" : "",
+                      }}
+                    >
+                      Perlu Revisi
+                    </span>
                   </label>
                 </div>
               </div>
@@ -332,21 +246,36 @@ const Validation = () => {
               <div className={styles.formGroup}>
                 <label className={styles.formLabel}>
                   Catatan / Feedback Supervisor
+                  {validationStatus === "Revisi" && (
+                    <span style={{ color: "red" }}> *</span>
+                  )}
                 </label>
                 <textarea
                   className={styles.formTextarea}
                   rows="3"
-                  placeholder="Berikan komentar jika ada revisi, atau catatan tambahan..."
+                  placeholder={
+                    validationStatus === "Revisi"
+                      ? "Jelaskan bagian mana yang perlu diperbaiki..."
+                      : "Berikan apresiasi atau catatan tambahan (opsional)..."
+                  }
                   value={feedback}
                   onChange={(e) => setFeedback(e.target.value)}
                 ></textarea>
               </div>
             </div>
 
-            {/* 4. FOOTER (Single Button) */}
+            {/* 4. FOOTER */}
             <div className={styles.modalFooter}>
-              <button className={styles.saveBtn} onClick={handleSaveValidation}>
-                Simpan Validasi
+              <button
+                className={styles.saveBtn}
+                onClick={handleSaveValidation}
+                disabled={isSaving}
+                style={{
+                  opacity: isSaving ? 0.7 : 1,
+                  cursor: isSaving ? "wait" : "pointer",
+                }}
+              >
+                {isSaving ? "Menyimpan..." : "Simpan Validasi"}
               </button>
             </div>
           </div>

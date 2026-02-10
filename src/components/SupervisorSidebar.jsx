@@ -1,44 +1,49 @@
 // src/components/SupervisorSidebar.jsx
-import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  PieChart,       // Dashboard
-  ClipboardList,  // Kelola Tugas
-  CheckCircle2,   // Validasi
-  Printer,        // Laporan
-  LogOut 
-} from 'lucide-react';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  PieChart, // Dashboard
+  ClipboardList, // Kelola Tugas
+  CheckCircle2, // Validasi
+  Printer, // Laporan
+  LogOut,
+} from "lucide-react";
 
-// IMPORT CSS YANG SAMA DENGAN ADMIN
-import styles from '../layouts/Sidebar.module.css'; 
+import styles from "../layouts/Sidebar.module.css";
+
+// 1. IMPORT LOGIN CONTROLLER
+import { LoginController } from "../controllers/LoginController";
 
 const SupervisorSidebar = () => {
-  const navigate = useNavigate();
+  // Kita tidak butuh useNavigate lagi karena LoginController yang akan handle redirect
 
+  // 2. FUNGSI LOGOUT DENGAN CONTROLLER
   const handleLogout = () => {
-    navigate('/login');
+    if (window.confirm("Apakah Anda yakin ingin keluar dari sistem?")) {
+      LoginController.logout();
+    }
   };
 
   const menuItems = [
-    { 
-      path: '/supervisor/dashboard', 
-      name: 'Dashboard', 
-      icon: <PieChart size={20} strokeWidth={2.5}/> 
+    {
+      path: "/supervisor/dashboard",
+      name: "Dashboard",
+      icon: <PieChart size={20} strokeWidth={2.5} />,
     },
-    { 
-      path: '/supervisor/tasks', 
-      name: 'Kelola Tugas', 
-      icon: <ClipboardList size={20} strokeWidth={2.5}/> 
+    {
+      path: "/supervisor/tasks",
+      name: "Kelola Tugas",
+      icon: <ClipboardList size={20} strokeWidth={2.5} />,
     },
-    { 
-      path: '/supervisor/validation', 
-      name: 'Validasi Laporan', 
-      icon: <CheckCircle2 size={20} strokeWidth={2.5}/> 
+    {
+      path: "/supervisor/validation",
+      name: "Validasi Laporan",
+      icon: <CheckCircle2 size={20} strokeWidth={2.5} />,
     },
-    { 
-      path: '/supervisor/reports', 
-      name: 'Pusat Laporan', 
-      icon: <Printer size={20} strokeWidth={2.5}/> 
+    {
+      path: "/supervisor/reports",
+      name: "Pusat Laporan",
+      icon: <Printer size={20} strokeWidth={2.5} />,
     },
   ];
 
@@ -46,7 +51,7 @@ const SupervisorSidebar = () => {
     <aside className={styles.sidebar}>
       {/* LOGO */}
       <h2 className={styles.logo}>SAGARA AI</h2>
-      
+
       {/* LABEL SUPERVISOR */}
       <p className={styles.label}>SUPERVISOR</p>
 
@@ -55,9 +60,9 @@ const SupervisorSidebar = () => {
         <ul className={styles.menu}>
           {menuItems.map((item) => (
             <li key={item.path}>
-              <NavLink 
+              <NavLink
                 to={item.path}
-                className={({ isActive }) => 
+                className={({ isActive }) =>
                   isActive ? `${styles.link} ${styles.active}` : styles.link
                 }
               >
@@ -69,12 +74,19 @@ const SupervisorSidebar = () => {
 
           {/* LOGOUT */}
           <li className={styles.logoutItem}>
-            <button 
-              className={styles.link} 
-              style={{ width: '100%', border: 'none', background: 'none' }}
+            <button
+              className={styles.link}
+              style={{
+                width: "100%",
+                border: "none",
+                background: "none",
+                cursor: "pointer",
+              }}
               onClick={handleLogout}
             >
-              <span className={styles.icon}><LogOut size={20} strokeWidth={2.5}/></span>
+              <span className={styles.icon}>
+                <LogOut size={20} strokeWidth={2.5} />
+              </span>
               Logout
             </button>
           </li>
@@ -85,3 +97,4 @@ const SupervisorSidebar = () => {
 };
 
 export default SupervisorSidebar;
+  

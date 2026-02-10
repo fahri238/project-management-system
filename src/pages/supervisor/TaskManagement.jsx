@@ -1,128 +1,24 @@
-import React, { useState } from "react";
-import {
-  Search,
-  Calendar,
-  User,
-  Plus,
-  MoreHorizontal,
-  Layers,
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Calendar, Users, Plus, Layers } from "lucide-react";
 import styles from "./TaskManagement.module.css";
 
+// --- IMPORT CONTROLLERS ---
+import { ProjectController } from "../../controllers/ProjectController";
+import { UserController } from "../../controllers/UserController";
+import { TaskController } from "../../controllers/TaskController";
+
 const TaskManagement = () => {
-  // 1. Data Dummy Proyek
-  const [projects] = useState([
-    {
-      id: 1,
-      title: "Sistem Deteksi Banjir IoT",
-      category: "Internet of Things", // Field baru untuk header card
-      description:
-        "Pengembangan model machine learning untuk prediksi level air real-time.",
-      supervisor: "Haldi Budiman",
-      progress: 75,
-      status: "Aktif",
-      deadline: "20 Feb 2026",
-    },
-    {
-      id: 2,
-      title: "AI Chatbot Layanan Publik",
-      category: "Artificial Intelligence",
-      description:
-        "Pembuatan agen cerdas untuk otomatisasi balasan layanan pelanggan.",
-      supervisor: "Haldi Budiman",
-      progress: 30,
-      status: "Pending",
-      deadline: "10 Mar 2026",
-    },
-    {
-      id: 3,
-      title: "Computer Vision Absensi",
-      category: "Computer Vision",
-      description:
-        "Sistem absensi wajah otomatis terintegrasi database karyawan.",
-      supervisor: "Haldi Budiman",
-      progress: 100,
-      status: "Selesai",
-      deadline: "01 Jan 2026",
-    },
-    {
-      id: 4,
-      title: "Sistem E-Voting Blockchain",
-      category: "Blockchain",
-      description:
-        "Pencatatan suara pemilihan ketua himpunan menggunakan smart contract Ethereum.",
-      supervisor: "Haldi Budiman",
-      progress: 10,
-      status: "Pending",
-      deadline: "15 Apr 2026",
-    },
-    {
-      id: 5,
-      title: "Aplikasi Mobile Telemedicine",
-      category: "Mobile Development",
-      description:
-        "Platform konsultasi dokter jarak jauh dengan fitur video call terenkripsi.",
-      supervisor: "Haldi Budiman",
-      progress: 65,
-      status: "Aktif",
-      deadline: "05 May 2026",
-    },
-    {
-      id: 6,
-      title: "Dashboard Analisis Saham",
-      category: "Data Science",
-      description:
-        "Visualisasi data pergerakan harga saham real-time menggunakan Python.",
-      supervisor: "Haldi Budiman",
-      progress: 100,
-      status: "Selesai",
-      deadline: "30 Dec 2025",
-    },
-    {
-      id: 7,
-      title: "Smart Home Energy Saver",
-      category: "Internet of Things",
-      description:
-        "Otomatisasi pemadaman listrik rumah berbasis sensor gerak dan cahaya.",
-      supervisor: "Haldi Budiman",
-      progress: 88,
-      status: "Aktif",
-      deadline: "28 Feb 2026",
-    },
-    {
-      id: 8,
-      title: "Analisis Sentimen Pemilu",
-      category: "Natural Language Processing",
-      description:
-        "Crawling dan klasifikasi opini publik di media sosial terkait calon legislatif.",
-      supervisor: "Haldi Budiman",
-      progress: 45,
-      status: "Aktif",
-      deadline: "12 Mar 2026",
-    },
-    {
-      id: 9,
-      title: "Virtual Tour Museum 360",
-      category: "Augmented Reality",
-      description:
-        "Aplikasi wisata virtual museum sejarah dengan panduan audio interaktif.",
-      supervisor: "Haldi Budiman",
-      progress: 5,
-      status: "Pending",
-      deadline: "20 Jun 2026",
-    },
-  ]);
-
-  // 2. Data Dummy Staff
-  const staffList = [
-    { id: 101, name: "Siti Aminah" },
-    { id: 102, name: "Andi Pratama" },
-    { id: 103, name: "Eko Wijaya" },
-    { id: 104, name: "Rina Kartika" },
-  ];
-
+  // --- 1. STATE DECLARATIONS ---
+  const [projects, setProjects] = useState([]);
+  const [staffList, setStaffList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // State UI
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProject, setSelectedProject] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // State Form
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -131,11 +27,40 @@ const TaskManagement = () => {
     priority: "Normal",
   });
 
+  // --- 2. LOAD DATA DARI CONTROLLER ---
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const dataProjects = await ProjectController.getAllProjects();
+        const dataStaff = await UserController.getAllStaff();
+
+        setProjects(dataProjects);
+        setStaffList(dataStaff);
+      } catch (error) {
+        console.error("Gagal memuat data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialData();
+  }, []);
+
+  // --- 3. LOGIC FILTER STAFF UNTUK DROPDOWN ---
+  // Kita buat variabel dinamis untuk dropdown
+  // Jika ada proyek dipilih, filter staffList berdasarkan nama yang ada di selectedProject.team
+  const availableStaffForProject = selectedProject
+    ? staffList.filter((staff) => 
+        selectedProject.team?.includes(staff.name)
+      )
+    : [];
+
+  // --- 4. FILTERING & LOGIC PROJECT LIST ---
   const filteredProjects = projects.filter((project) =>
-    project.title.toLowerCase().includes(searchTerm.toLowerCase()),
+    project.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // --- HANDLERS ---
+  // --- 5. HANDLERS ---
   const handleOpenModal = (project) => {
     setSelectedProject(project);
   };
@@ -156,14 +81,30 @@ const TaskManagement = () => {
     setNewTask({ ...newTask, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Tugas Baru:", newTask, "Proyek:", selectedProject.title);
-    alert(`Tugas "${newTask.title}" berhasil ditambahkan!`);
-    handleCloseModal();
+    setIsSubmitting(true);
+
+    const finalData = {
+      ...newTask,
+      projectId: selectedProject.id,
+      projectName: selectedProject.title,
+    };
+
+    try {
+      const result = await TaskController.createTask(finalData);
+      if (result.success) {
+        alert(result.message);
+        handleCloseModal();
+      }
+    } catch (error) {
+      alert("Gagal membuat tugas.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // --- HELPER UI ---
+  // Helper UI
   const getProgressColor = (progress) => {
     if (progress === 100) return "#10b981";
     if (progress < 40) return "#f59e0b";
@@ -194,82 +135,89 @@ const TaskManagement = () => {
         </div>
       </div>
 
-      {/* GRID CARDS (Style disamakan dengan MyTasks) */}
-      <div className={styles.gridContainer}>
-        {filteredProjects.map((project) => (
-          <div key={project.id} className={styles.card}>
-            {/* 1. Card Context (Header Abu-abu) */}
-            <div className={styles.cardContext}>
-              <span className={styles.categoryLabel}>
-                <Layers size={12} style={{ marginRight: "4px" }} />
-                {project.category}
-              </span>
-              <span
-                className={`${styles.statusBadge} ${styles[project.status.toLowerCase()]}`}
-              >
-                {project.status}
-              </span>
-            </div>
-
-            {/* 2. Card Body */}
-            <div className={styles.cardBody}>
-              <h3 className={styles.projectTitle}>{project.title}</h3>
-              <p className={styles.description}>{project.description}</p>
-
-              <div className={styles.supervisorInfo}>
-                <User size={14} /> Lead: {project.supervisor}
-              </div>
-            </div>
-
-            {/* 3. Progress Section (Khas Halaman Ini) */}
-            <div className={styles.progressArea}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: "0.75rem",
-                  marginBottom: "4px",
-                  color: "#64748b",
-                }}
-              >
-                <span>Progress Tim</span>
+      {/* LOADING CHECK */}
+      {isLoading ? (
+        <div style={{ textAlign: "center", padding: "40px", color: "#64748b" }}>
+          Memuat data proyek...
+        </div>
+      ) : (
+        /* GRID CARDS */
+        <div className={styles.gridContainer}>
+          {filteredProjects.map((project) => (
+            <div key={project.id} className={styles.card}>
+              <div className={styles.cardContext}>
+                <span className={styles.categoryLabel}>
+                  <Layers size={12} style={{ marginRight: "4px" }} />
+                  {project.category}
+                </span>
                 <span
-                  style={{
-                    fontWeight: "600",
-                    color: getProgressColor(project.progress),
-                  }}
+                  className={`${styles.statusBadge} ${styles[project.status.toLowerCase()]}`}
                 >
-                  {project.progress}%
+                  {project.status}
                 </span>
               </div>
-              <div className={styles.progressBarBg}>
+
+              <div className={styles.cardBody}>
+                <h3 className={styles.projectTitle}>{project.title}</h3>
+                <p className={styles.description}>{project.description}</p>
+                
+                {/* INFO TIM (Menampilkan Jumlah Staff) */}
+                <div className={styles.supervisorInfo} style={{ marginTop: 'auto' }}>
+                  <Users size={14} style={{ marginRight: '6px' }} /> 
+                  <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                    Tim: <strong>{project.team ? project.team.length : 0} Staff</strong>
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.progressArea}>
                 <div
-                  className={styles.progressBarFill}
                   style={{
-                    width: `${project.progress}%`,
-                    background: getProgressColor(project.progress),
+                    display: "flex",
+                    justifyContent: "space-between",
+                    fontSize: "0.75rem",
+                    marginBottom: "4px",
+                    color: "#64748b",
                   }}
-                ></div>
+                >
+                  <span>Progress Tim</span>
+                  <span
+                    style={{
+                      fontWeight: "600",
+                      color: getProgressColor(project.progress),
+                    }}
+                  >
+                    {project.progress}%
+                  </span>
+                </div>
+                <div className={styles.progressBarBg}>
+                  <div
+                    className={styles.progressBarFill}
+                    style={{
+                      width: `${project.progress}%`,
+                      background: getProgressColor(project.progress),
+                    }}
+                  ></div>
+                </div>
+              </div>
+
+              <div className={styles.cardFooter}>
+                <div className={styles.deadline}>
+                  <Calendar size={14} /> {project.deadline}
+                </div>
+                <button
+                  className={styles.createBtn}
+                  onClick={() => handleOpenModal(project)}
+                >
+                  <Plus size={16} /> Buat Tugas
+                </button>
               </div>
             </div>
+          ))}
+        </div>
+      )}
 
-            {/* 4. Card Footer (Deadline & Action) */}
-            <div className={styles.cardFooter}>
-              <div className={styles.deadline}>
-                <Calendar size={14} /> {project.deadline}
-              </div>
-              <button
-                className={styles.createBtn}
-                onClick={() => handleOpenModal(project)}
-              >
-                <Plus size={16} /> Buat Tugas
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* --- MODAL FORM (Sama seperti sebelumnya) --- */}
+      {/* --- MODAL FORM --- */}
       {selectedProject && (
         <div className={styles.modalOverlay} onClick={handleCloseModal}>
           <div
@@ -319,6 +267,8 @@ const TaskManagement = () => {
                       required
                     ></textarea>
                   </div>
+                  
+                  {/* --- DROPDOWN STAFF (SUDAH DIFILTER) --- */}
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>
                       Ditugaskan Kepada
@@ -331,13 +281,22 @@ const TaskManagement = () => {
                       required
                     >
                       <option value="">-- Pilih Staff --</option>
-                      {staffList.map((staff) => (
-                        <option key={staff.id} value={staff.name}>
-                          {staff.name}
-                        </option>
-                      ))}
+                      
+                      {/* TAMPILKAN STAFF YG DIFILTER */}
+                      {availableStaffForProject.length > 0 ? (
+                        availableStaffForProject.map((staff) => (
+                          <option key={staff.user_id} value={staff.name}>
+                            {staff.name}
+                          </option>
+                        ))
+                      ) : (
+                        <option disabled>Tidak ada staff di proyek ini</option>
+                      )}
+
                     </select>
                   </div>
+                  {/* --------------------------------------- */}
+
                   <div className={styles.formGroup}>
                     <label className={styles.formLabel}>Deadline</label>
                     <input
@@ -369,11 +328,16 @@ const TaskManagement = () => {
                   type="button"
                   className={styles.cancelBtn}
                   onClick={handleCloseModal}
+                  disabled={isSubmitting}
                 >
                   Batal
                 </button>
-                <button type="submit" className={styles.saveBtn}>
-                  Simpan Tugas
+                <button
+                  type="submit"
+                  className={styles.saveBtn}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Menyimpan..." : "Simpan Tugas"}
                 </button>
               </div>
             </form>
